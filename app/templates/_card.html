@@ -3,8 +3,17 @@
    listing whose star count nobody could confirm, and says of the rest "Do not imply
    one". Flattening the three into a single score would overstate eleven of sixteen. #}
 <a class="card" href="/champagne/{{ wine.slug }}">
-  <div class="card-bottle" style="--accent: {{ accent_of(wine) }}">
-    {{ bottle(wine, width=104, height=330) }}
+  {% set photo = photo_for(wine) %}
+  {# The drawn bottle sits behind the photograph and shows through when there is none,
+     or when the photograph fails to load. Retailer images are hotlinked unless they
+     have been downloaded, and a hotlink breaks the day the host moves the path - this
+     is what stops that leaving a hole in the grid. #}
+  <div class="card-bottle{% if photo %} has-photo{% endif %}" style="--accent: {{ accent_of(wine) }}">
+    {% if photo %}
+      <img class="photo" src="{{ photo }}" alt="" loading="lazy" decoding="async"
+           onerror="this.closest('.card-bottle').classList.remove('has-photo'); this.remove();">
+    {% endif %}
+    <span class="drawn">{{ bottle(wine, width=104, height=330) }}</span>
   </div>
   <div class="card-body">
     <h2 class="card-name">

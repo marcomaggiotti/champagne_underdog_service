@@ -363,3 +363,63 @@ td.num { white-space: nowrap; font-variant-numeric: tabular-nums; }
   .legend li { grid-template-columns: 1fr; gap: 4px; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 12px; }
 }
+
+/* --- bottle photographs ---------------------------------------------------------
+   The drawn bottle is always in the markup; the photograph covers it when there is
+   one. Swapping visibility rather than choosing at render time is what lets a broken
+   hotlink fall back without a round trip. */
+
+.card-bottle, .wine-figure { position: relative; }
+
+.card-bottle .photo, .wine-figure .photo {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.card-bottle .photo { max-height: 330px; }
+.wine-figure .photo { max-height: 600px; border-radius: 6px; }
+
+/* Show one or the other, never both. */
+.card-bottle.has-photo .drawn, .wine-figure.has-photo .drawn { display: none; }
+.card-bottle:not(.has-photo) .photo, .wine-figure:not(.has-photo) .photo { display: none; }
+
+/* Retailer shots are cut out on white, which floats oddly on a dark page. A soft plate
+   behind them keeps the grid even in both schemes. */
+@media (prefers-color-scheme: dark) {
+  .card-bottle.has-photo, .wine-figure.has-photo {
+    background: #f4f2ee;
+    border-radius: 10px;
+  }
+}
+
+/* --- sort control ---------------------------------------------------------------- */
+
+.sortbar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 0 0 6px;
+}
+
+.sortbar h2 { margin: 0; font-size: 20px; }
+
+.sorts { display: flex; gap: 4px; margin: 0; }
+
+.sorts a {
+  font-size: 13.5px;
+  text-decoration: none;
+  color: var(--muted);
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.sorts a.on { background: var(--green); border-color: var(--green); color: #f7f5f0; font-weight: 600; }
+@media (prefers-color-scheme: dark) { .sorts a.on { color: #10180f; } }
+.sorts a:hover:not(.on) { border-color: var(--green); color: var(--ink); }
+
+.sortnote { margin: 0 0 18px; max-width: 76ch; }

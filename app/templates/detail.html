@@ -4,8 +4,14 @@
 <nav class="crumbs"><a href="/">← All sixteen</a></nav>
 
 <article class="wine">
-  <div class="wine-figure" style="--accent: {{ accent_of(wine) }}">
-    {{ bottle(wine, width=190, height=600, decorative=False) }}
+  {% set photo = photo_for(wine, hires=True) %}
+  <div class="wine-figure{% if photo %} has-photo{% endif %}" style="--accent: {{ accent_of(wine) }}">
+    {% if photo %}
+      <img class="photo" src="{{ photo }}" decoding="async"
+           alt="Bottle of {{ wine.producer }} {{ wine.cuvee }}"
+           onerror="this.closest('.wine-figure').classList.remove('has-photo'); this.remove();">
+    {% endif %}
+    <span class="drawn">{{ bottle(wine, width=190, height=600, decorative=False) }}</span>
   </div>
 
   <div class="wine-main">
@@ -96,16 +102,29 @@
 
     <section class="block">
       <h2>About this bottle image</h2>
-      <p>
-        The bottle above is an illustration, not a photograph of this wine. Retailer and
-        producer photographs belong to whoever took them, and hotlinking them would also
-        break the moment the host changed a path.
-        {% if wine.image_rights.status %}<br><span class="thin">Status: {{ wine.image_rights.status }}</span>{% endif %}
-      </p>
+      {% if wine.image.url %}
+        <p>
+          The photograph is {{ wine.visit.name if wine.visit else wine.producer }}&rsquo;s bottle as
+          published by <strong>{{ wine.image.host }}</strong>. It belongs to the retailer or the
+          producer, not to this site, and is shown here for reference while permission is
+          sought. Ask the grower for press images, or photograph the bottle yourself —
+          either way you then own what you publish.
+        </p>
+        <p class="thin">
+          {% if wine.image.status %}Source status: {{ wine.image.status }}.{% endif %}
+          Until the file is downloaded and served locally it is hotlinked, which can break
+          without warning; if it does, the drawn bottle takes its place.
+        </p>
+      {% else %}
+        <p>
+          No photograph was found for this wine, so the bottle above is drawn. Its product
+          page did not expose an image during research — open it and copy the image address,
+          or ask the producer.
+        </p>
+      {% endif %}
       <p class="links">
-        {% if wine.image_rights.producer_site %}<a href="{{ wine.image_rights.producer_site }}" target="_blank" rel="noopener noreferrer">Ask the producer for images ↗</a>{% endif %}
-        {% if wine.image_rights.product_page %}<a href="{{ wine.image_rights.product_page }}" target="_blank" rel="noopener noreferrer">See the real bottle ↗</a>{% endif %}
-        {% if wine.image_rights.phone %}<span class="thin">{{ wine.image_rights.phone }}</span>{% endif %}
+        {% if wine.visit and wine.visit.website %}<a href="{{ wine.visit.website }}" target="_blank" rel="noopener noreferrer">Ask the producer for images ↗</a>{% endif %}
+        {% if wine.product_url %}<a href="{{ wine.product_url }}" target="_blank" rel="noopener noreferrer">See it on the retailer&rsquo;s page ↗</a>{% endif %}
       </p>
     </section>
 

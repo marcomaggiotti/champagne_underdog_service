@@ -31,7 +31,23 @@
   </ul>
 </section>
 
-<section class="grid" aria-label="The sixteen Champagnes, cheapest first">
+<div class="sortbar">
+  <h2>The list</h2>
+  <p class="sorts">
+    <a href="/?sort=rating" class="{{ 'on' if sort == 'rating' }}" aria-current="{{ 'true' if sort == 'rating' else 'false' }}">Best rated first</a>
+    <a href="/?sort=price" class="{{ 'on' if sort == 'price' }}" aria-current="{{ 'true' if sort == 'price' else 'false' }}">Cheapest first</a>
+  </p>
+</div>
+{% if sort == 'rating' %}
+<p class="thin sortnote">
+  Ordered by the strongest professional credential found: the best star count any guide
+  awarded, with a Coup de C&oelig;ur counting above the stars beside it, and a critic&rsquo;s point
+  score standing in where no stars exist. Wines the guide only lists follow, then those
+  with no professional rating at all.
+</p>
+{% endif %}
+
+<section class="grid" aria-label="The sixteen Champagnes">
   {% for wine in wines %}{% include "_card.html" %}{% endfor %}
 </section>
 {% endblock %}

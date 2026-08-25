@@ -186,3 +186,136 @@ def test_a_single_word_producer_keeps_one_initial():
 def test_producer_names_are_escaped_into_the_svg():
     svg = bottle_svg('Ma<script>alert(1)</script>', "Brut", decorative=False)
     assert "<script>" not in svg
+
+
+# --- ordering ----------------------------------------------------------------------
+
+def test_the_gallery_leads_with_the_best_credential():
+    """The default order is by professional rating, strongest first."""
+    body = client.get("/").text
+    positions = {slug: body.index(f'/champagne/{slug}') for slug in [
+        "jacques-chaput-brut-tradition",       # 3 stars (1001 Dégustations) + Coup de Cœur
+        "claude-baron-cuvee-pierre-de-lune-blanc-de-blancs",  # 3 stars
+        "besserat-de-bellefon-brut-bleu",      # 2 stars
+        "pescheux-reserve",                    # nothing
+    ]}
+    order = sorted(positions, key=positions.get)
+    assert order == [
+        "jacques-chaput-brut-tradition",
+        "claude-baron-cuvee-pierre-de-lune-blanc-de-blancs",
+        "besserat-de-bellefon-brut-bleu",
+        "pescheux-reserve",
+    ]
+
+
+def test_every_rated_wine_outranks_every_unrated_one(catalogue):
+    from app.main import by_rating
+
+    ordered = sorted(catalogue, key=by_rating)
+    tiers = [w["score_tier"] for w in ordered]
+    assert tiers.index("none") > max(i for i, t in enumerate(tiers) if t == "verified")
+    # A guide listing is weak evidence, but it is more than none.
+    assert tiers.index("none") > max(i for i, t in enumerate(tiers) if t == "listed")
+
+
+def test_price_order_is_still_available():
+    body = client.get("/?sort=price").text
+    cheapest = body.index("/champagne/sonnette-brut-tradition")          # €22
+    dearest = body.index("/champagne/besserat-de-bellefon-brut-bleu")    # €34.70
+    assert cheapest < dearest
+
+
+def test_an_unknown_sort_falls_back_rather_than_erroring():
+    assert client.get("/?sort=nonsense").status_code == 200
+
+
+def test_ties_are_broken_by_points_then_price(catalogue):
+    """Three wines hold three stars; the order between them should be stable and
+    explicable rather than whatever the workbook happened to list."""
+    from app.main import by_rating
+
+    three_star = [w for w in sorted(catalogue, key=by_rating) if w["rating_rank"] == 3.0]
+    assert [w["producer"] for w in three_star] == ["Christian Naudé", "Sonnette", "Claude Baron"]
+
+
+# --- ratings, after the workbook revision -------------------------------------------
+
+def test_the_headline_quotes_the_best_point_score(catalogue):
+    """André Chemin reads "94 pts (critic aggregate); 97 pts Decanter". Quoting the
+    first number found understated it."""
+    chemin = next(w for w in catalogue if w["producer"] == "André Chemin")
+    assert chemin["points"] == 97
+    assert chemin["headline_score"] == "97 pts (Decanter)"
+
+
+def test_the_badge_never_credits_hachette_with_another_guide_s_stars(catalogue):
+    """Jacques Chaput has two Hachette stars and three from 1001 Dégustations. The
+    badge names Hachette, so it must show two."""
+    chaput = next(w for w in catalogue if w["producer"] == "Jacques Chaput")
+    assert chaput["stars"] == 3                  # the best any guide gave, used for ranking
+    assert chaput["headline_score"].startswith("2★")   # what Hachette itself gave
+    assert chaput["coup_de_coeur"]
+
+
+def test_the_upgraded_ratings_came_through(catalogue):
+    """Two wines moved from unconfirmed to three stars in this workbook revision."""
+    for producer in ("Sonnette", "Christian Naudé"):
+        wine = next(w for w in catalogue if w["producer"] == producer)
+        assert wine["score_tier"] == "verified" and wine["stars"] == 3
+
+
+# --- photographs ---------------------------------------------------------------------
+
+def test_almost_every_wine_has_a_photograph(catalogue):
+    with_photo = [w for w in catalogue if w["image"].get("url")]
+    assert len(with_photo) == 15
+    missing = [w["producer"] for w in catalogue if not w["image"].get("url")]
+    assert missing == ["Besserat de Bellefon"]
+
+
+def test_two_wines_by_one_producer_get_their_own_photographs(catalogue):
+    """Matching on producer alone gave both Olivier Rousseaux cuvées the same bottle."""
+    rousseaux = [w for w in catalogue if w["producer"] == "Olivier Rousseaux"]
+    assert len(rousseaux) == 2
+    urls = {w["image"]["url"] for w in rousseaux}
+    assert len(urls) == 2
+    tradition = next(w for w in rousseaux if "Tradition" in w["cuvee"])
+    assert "tradition" in tradition["image"]["url"]
+
+
+def test_the_gallery_renders_the_photographs():
+    body = client.get("/").text
+    assert body.count('class="photo"') == 15
+
+
+def test_a_drawn_bottle_is_always_behind_the_photograph():
+    """A hotlink can break at any time; the page must not be left with a hole."""
+    body = client.get("/").text
+    assert body.count('class="drawn"') == 16
+    assert "onerror=" in body
+
+
+def test_the_wine_without_a_photograph_still_shows_a_bottle():
+    body = client.get("/champagne/besserat-de-bellefon-brut-bleu").text
+    assert 'class="photo"' not in body
+    assert "svg" in body
+    assert "No photograph was found" in body
+
+
+def test_a_downloaded_file_wins_over_the_retailer_url(tmp_path, monkeypatch):
+    """Once scripts/fetch_images.py has run, the site must stop hotlinking."""
+    from app import main
+
+    wine = next(w for w in load_data()["wines"] if w["image"].get("url"))
+    monkeypatch.setattr(main, "PHOTO_DIR", tmp_path)
+    assert main.photo_for(wine).startswith("http")
+    (tmp_path / f"{wine['slug']}.jpg").write_bytes(b"x")
+    assert main.photo_for(wine) == f"/static/bottles/{wine['slug']}.jpg"
+
+
+def test_the_detail_page_says_whose_photograph_it_is():
+    body = client.get("/champagne/gaudriller-extra-brut-grand-cru").text
+    flat = " ".join(body.split())  # the template wraps; the wording is what matters
+    assert "champagne-terroir.fr" in flat
+    assert "belongs to the retailer or the producer, not to this site" in flat
+    assert "permission is sought" in flat

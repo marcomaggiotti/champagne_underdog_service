@@ -16,7 +16,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -59,6 +59,46 @@ def find(slug: str) -> dict[str, Any] | None:
     return next((w for w in wines() if w["slug"] == slug), None)
 
 
+#: Where scripts/fetch_images.py puts downloaded photographs.
+PHOTO_DIR = BASE / "static" / "bottles"
+
+
+def photo_for(wine: dict[str, Any], hires: bool = False) -> str:
+    """The bottle photograph to show, preferring our own copy.
+
+    A downloaded file wins over the retailer's URL every time. Hotlinking works right up
+    until the host blocks it or moves the path, and then the page has a hole in it -
+    which is exactly what the workbook warns about. Run scripts/fetch_images.py and this
+    starts serving local files with no other change.
+
+    Returns "" when there is no photograph at all, and the drawn bottle stands in.
+    """
+    for suffix in (".jpg", ".jpeg", ".png", ".webp"):
+        local = PHOTO_DIR / f"{wine['slug']}{suffix}"
+        if local.exists():
+            return f"/static/bottles/{local.name}"
+    image = wine.get("image") or {}
+    if hires and image.get("hires"):
+        return image["hires"]
+    return image.get("url") or ""
+
+
+def by_rating(wine: dict[str, Any]) -> tuple:
+    """Best-credentialled first.
+
+    Ties are broken by point score and then by price, so three three-star wines appear
+    cheapest-last rather than in whatever order the workbook happened to list them.
+    """
+    return (-wine["rating_rank"], -(wine.get("points") or 0), wine["price_eur"] or 0)
+
+
+def by_price(wine: dict[str, Any]) -> tuple:
+    return (wine["price_eur"] or 0,)
+
+
+SORTS = {"rating": by_rating, "price": by_price}
+
+
 def price_label(value: float | None) -> str:
     """€22 for a round price, €26.50 for anything else.
 
@@ -75,14 +115,20 @@ templates.env.globals["bottle"] = lambda w, **kw: Markup(
     bottle_svg(w["producer"], w["cuvee"], w["style"], w["classification"], **kw)
 )
 templates.env.globals["accent_of"] = lambda w: style_accent(f"{w['style']} {w['cuvee']}")[0]
+templates.env.globals["photo_for"] = photo_for
 templates.env.filters["price"] = price_label
 
 
 @app.get("/", response_class=HTMLResponse)
-def gallery(request: Request):
-    catalogue = wines()
+def gallery(
+    request: Request,
+    sort: str = Query(default="rating", description="'rating' (default) or 'price'"),
+):
+    sort = sort if sort in SORTS else "rating"
+    catalogue = sorted(wines(), key=SORTS[sort])
     return templates.TemplateResponse(request, "index.html", {
         "wines": catalogue,
+        "sort": sort,
         "notes": load_data()["notes"],
         "cheapest": min((w["price_eur"] for w in catalogue if w["price_eur"]), default=None),
         "dearest": max((w["price_eur"] for w in catalogue if w["price_eur"]), default=None),
@@ -95,11 +141,11 @@ def detail(request: Request, slug: str):
     wine = find(slug)
     if wine is None:
         raise HTTPException(status_code=404, detail=f"No champagne with the name {slug!r}.")
-    catalogue = wines()
+    catalogue = sorted(wines(), key=by_rating)
     position = next(i for i, w in enumerate(catalogue) if w["slug"] == slug)
     return templates.TemplateResponse(request, "detail.html", {
         "wine": wine,
-        # Previous/next by price, so the list can be walked in the order it is presented.
+        # Previous/next in the gallery's own order, so the list can be walked as shown.
         "previous": catalogue[position - 1] if position > 0 else None,
         "next": catalogue[position + 1] if position + 1 < len(catalogue) else None,
     })

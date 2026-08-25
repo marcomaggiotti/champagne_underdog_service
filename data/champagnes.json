@@ -9,21 +9,24 @@
       "classification": "",
       "style": "Brut",
       "price_eur": 22.0,
-      "professional_score": "Guide Hachette 2026 (listed)",
-      "score_tier": "listed",
-      "headline_score": "Guide Hachette listed",
+      "professional_score": "3 STARS — Guide Hachette 2026",
+      "score_tier": "verified",
+      "headline_score": "3★ Guide Hachette",
+      "stars": 3,
+      "points": null,
+      "coup_de_coeur": false,
+      "rating_rank": 3.0,
       "medals": "",
       "retailer_rating": null,
       "description": "Selected by the Guide Hachette des Vins 2026 — France's most trusted buying guide, which blind-tastes some 35,000 wines a year and retains only the best. A Brut Tradition in the classic grower mould, and one of the cheapest starred Champagnes you will find anywhere.",
       "product_url": "https://www.hachette-vins.shop/guide-hachette-des-vins/guide-hachette-des-vins-2026/",
-      "verification_note": "Guide Hachette 2026 listing confirmed; star count NOT confirmed — verify before publishing",
-      "image_rights": {
+      "verification_note": "Star count now CONFIRMED via hachette-vins.shop. Listed €19.90 (from €22.00)",
+      "image": {
         "cuvee": "Brut Tradition",
-        "verified_url": "",
-        "product_page": "https://www.hachette-vins.shop/guide-hachette-des-vins/guide-hachette-des-vins-2026/",
-        "producer_site": "",
-        "phone": "",
-        "status": "Producer not yet located"
+        "url": "https://www.hachette-vins.shop/media/cf/bb/d9/1766937617/019a2f9b551c7c45a1a98732d6a3d10d.jpg?ts=1787004152",
+        "hires": "",
+        "host": "hachette-vins.shop",
+        "status": "VERIFIED"
       },
       "visit": null,
       "other_prices": []
@@ -40,18 +43,21 @@
       "professional_score": "",
       "score_tier": "none",
       "headline_score": "",
+      "stars": null,
+      "points": null,
+      "coup_de_coeur": false,
+      "rating_rank": 0.0,
       "medals": "",
       "retailer_rating": 4.5,
       "description": "A Grand Cru extra brut at a price that looks like a misprint. The low dosage strips away the sugar cushion and leaves fruit and chalk to speak for themselves — a dry, direct style for drinkers who want Champagne to taste of its soil rather than of its liqueur d'expédition.",
       "product_url": "https://www.champagne-terroir.fr/en/gaudriller/416-champagne-gaudriller-extra-brut-grand-cru.html",
       "verification_note": "No professional score or medal found",
-      "image_rights": {
+      "image": {
         "cuvee": "Extra Brut Grand Cru",
-        "verified_url": "",
-        "product_page": "https://www.champagne-terroir.fr/en/gaudriller/416-champagne-gaudriller-extra-brut-grand-cru.html",
-        "producer_site": "",
-        "phone": "",
-        "status": "Producer not yet located"
+        "url": "https://media.champagne-terroir.fr/393-home_default/champagne-gaudriller-extra-brut-grand-cru.jpg",
+        "hires": "https://media.champagne-terroir.fr/393-large_default/champagne-gaudriller-extra-brut-grand-cru.jpg",
+        "host": "champagne-terroir.fr",
+        "status": "VERIFIED"
       },
       "visit": null,
       "other_prices": []
@@ -68,18 +74,21 @@
       "professional_score": "",
       "score_tier": "none",
       "headline_score": "",
+      "stars": null,
+      "points": null,
+      "coup_de_coeur": false,
+      "rating_rank": 0.0,
       "medals": "",
       "retailer_rating": 5.0,
       "description": "The house's signature cuvée and one of the retailer's highest-rated bottles overall. A Réserve blend built for consistency rather than drama: the kind of everyday Champagne a grower keeps for their own table.",
       "product_url": "https://www.champagne-terroir.fr/en/pescheux/835-champagne-pescheux-reserve.html",
       "verification_note": "No professional score or medal found",
-      "image_rights": {
+      "image": {
         "cuvee": "Réserve",
-        "verified_url": "",
-        "product_page": "https://www.champagne-terroir.fr/en/pescheux/835-champagne-pescheux-reserve.html",
-        "producer_site": "http://www.champagne-pescheux.com/",
-        "phone": "+33 9 74 56 10 17",
-        "status": "Ask grower"
+        "url": "https://media.champagne-terroir.fr/1063-home_default/champagne-pescheux-reserve.jpg",
+        "hires": "https://media.champagne-terroir.fr/1063-large_default/champagne-pescheux-reserve.jpg",
+        "host": "champagne-terroir.fr",
+        "status": "VERIFIED"
       },
       "visit": {
         "name": "Champagne Pescheux",
@@ -107,18 +116,21 @@
       "professional_score": "Guide Hachette 2026 (retailer's starred page)",
       "score_tier": "listed",
       "headline_score": "Guide Hachette listed",
+      "stars": null,
+      "points": null,
+      "coup_de_coeur": false,
+      "rating_rank": 0.25,
       "medals": "",
       "retailer_rating": null,
       "description": "A husband-and-wife grower estate whose Brut Réserve appears among the Guide Hachette 2026 starred selection. Reserve wines in the blend give it the roundness and continuity that define the style.",
       "product_url": "https://ed-champ.fr/gb/laetitia-et-olivier-marteaux/141-champagne-brut-reserve-olivier-et-laetitia-marteaux.html",
       "verification_note": "Appears on retailer's Hachette-starred page; star count NOT stated — verify before publishing",
-      "image_rights": {
-        "cuvee": "Tradition Grand Cru",
-        "verified_url": "",
-        "product_page": "https://www.champagne-terroir.fr/en/olivier-rousseaux/934-champagne-olivier-rousseaux-tradition-grand-cru.html",
-        "producer_site": "http://www.champagne-olivier-rousseaux.fr/",
-        "phone": "+33 3 26 49 40 50",
-        "status": "Ask grower"
+      "image": {
+        "cuvee": "Brut Réserve",
+        "url": "https://ed-champ.fr/1808-small_default/champagne-brut-reserve-olivier-marteaux.jpg",
+        "hires": "https://ed-champ.fr/1808-large_default/champagne-brut-reserve-olivier-marteaux.jpg",
+        "host": "ed-champ.fr",
+        "status": "VERIFIED"
       },
       "visit": {
         "name": "Champagne Olivier Rousseaux",
@@ -146,18 +158,21 @@
       "professional_score": "",
       "score_tier": "none",
       "headline_score": "",
+      "stars": null,
+      "points": null,
+      "coup_de_coeur": false,
+      "rating_rank": 0.0,
       "medals": "1 award",
       "retailer_rating": 4.6,
       "description": "An all-Chardonnay cuvée at a price where blanc de blancs rarely appears. Expect the florality, citrus lift and mineral cut that make this style the classic aperitif Champagne — and a natural partner for oysters and delicate white fish.",
       "product_url": "https://www.champagne-terroir.fr/en/drouilly-lv/45-drouilly-lv-champagne-angeline-cuvee.html",
       "verification_note": "Award count from retailer; awarding body not identified",
-      "image_rights": {
+      "image": {
         "cuvee": "Cuvée A Blanc de Blancs",
-        "verified_url": "",
-        "product_page": "https://www.champagne-terroir.fr/en/drouilly-lv/45-drouilly-lv-champagne-angeline-cuvee.html",
-        "producer_site": "",
-        "phone": "",
-        "status": "Producer not yet located"
+        "url": "https://media.champagne-terroir.fr/29-home_default/drouilly-lv-champagne-angeline-cuvee.jpg",
+        "hires": "https://media.champagne-terroir.fr/29-large_default/drouilly-lv-champagne-angeline-cuvee.jpg",
+        "host": "champagne-terroir.fr",
+        "status": "VERIFIED"
       },
       "visit": null,
       "other_prices": []
@@ -171,21 +186,24 @@
       "classification": "",
       "style": "Blanc de Noirs",
       "price_eur": 24.9,
-      "professional_score": "96 points (single critic)",
+      "professional_score": "3 STARS — Guide Hachette 2025; also 96 pts (single critic)",
       "score_tier": "verified",
-      "headline_score": "96 pts (critic)",
+      "headline_score": "3★ Guide Hachette",
+      "stars": 3,
+      "points": 96,
+      "coup_de_coeur": false,
+      "rating_rank": 3.0,
       "medals": "3 awards",
       "retailer_rating": 4.6,
       "description": "Singled out by Wine-Searcher as one of the sharpest value propositions in all of Champagne, this blanc de noirs carries a 96-point critic score at a fraction of the price such a number usually commands. Made entirely from black grapes and gently pressed to keep the wine white, it delivers the breadth, spice and faintly smoky depth that Pinot brings.",
       "product_url": "https://www.champagne-terroir.fr/en/christian-naude/74-christian-naude-champagne-tradition.html",
-      "verification_note": "96 pts is a single critic review reported by Wine-Searcher; critic not named",
-      "image_rights": {
+      "verification_note": "Hachette 3-star rating confirmed on hachette-vins.shop (listed at €25.00)",
+      "image": {
         "cuvee": "Tradition Blanc de Noirs",
-        "verified_url": "",
-        "product_page": "https://www.champagne-terroir.fr/en/christian-naude/74-christian-naude-champagne-tradition.html",
-        "producer_site": "",
-        "phone": "+33 3 23 82 74 51",
-        "status": "Phone only - ask on the trip"
+        "url": "https://www.hachette-vins.shop/media/76/f5/e4/1766937619/0199ec05304a7ef99828932e68587183.jpg?ts=1786831315",
+        "hires": "https://media.champagne-terroir.fr/44-large_default/christian-naude-champagne-tradition.jpg",
+        "host": "hachette-vins.shop + champagne-terroir.fr",
+        "status": "VERIFIED (two sources)"
       },
       "visit": {
         "name": "Champagne Christian Naudé",
@@ -223,18 +241,21 @@
       "professional_score": "",
       "score_tier": "none",
       "headline_score": "",
+      "stars": null,
+      "points": null,
+      "coup_de_coeur": false,
+      "rating_rank": 0.0,
       "medals": "",
       "retailer_rating": 4.6,
       "description": "Grand Cru fruit at an entry-level price. Only seventeen villages in Champagne hold the Grand Cru classification, and finding one under €26 from a grower rather than a négociant is genuinely unusual.",
       "product_url": "https://www.champagne-terroir.fr/en/champagne-hardy-stephane/483-champagne-hardy-stephane-brut.html",
       "verification_note": "No professional score or medal found",
-      "image_rights": {
+      "image": {
         "cuvee": "Brut Grand Cru",
-        "verified_url": "",
-        "product_page": "https://www.champagne-terroir.fr/en/champagne-hardy-stephane/483-champagne-hardy-stephane-brut.html",
-        "producer_site": "http://champagne-stephane-hardy.com/",
-        "phone": "+33 6 85 20 57 39",
-        "status": "Ask grower"
+        "url": "https://media.champagne-terroir.fr/452-home_default/champagne-hardy-stephane-brut.jpg",
+        "hires": "https://media.champagne-terroir.fr/452-large_default/champagne-hardy-stephane-brut.jpg",
+        "host": "champagne-terroir.fr",
+        "status": "VERIFIED"
       },
       "visit": {
         "name": "Champagne Stéphane Hardy",
@@ -262,18 +283,21 @@
       "professional_score": "",
       "score_tier": "none",
       "headline_score": "",
+      "stars": null,
+      "points": null,
+      "coup_de_coeur": false,
+      "rating_rank": 0.0,
       "medals": "",
       "retailer_rating": null,
       "description": "A single-vintage blanc de noirs from the warm, generous 2018 harvest — a year that gave Champagne unusual ripeness. Vintage-dated Champagne at this price is close to unheard of, since declaring a vintage normally signals a step up in both ambition and cost.",
       "product_url": "https://www.champagne-terroir.fr/en/barthelemy-pinot/898-champagne-barthelemy-pinot-blanc-de-noirs-vintage-2018.html",
       "verification_note": "OUT OF STOCK at time of research. No professional score found",
-      "image_rights": {
+      "image": {
         "cuvee": "Blanc de Noirs Vintage 2018",
-        "verified_url": "",
-        "product_page": "https://www.champagne-terroir.fr/en/barthelemy-pinot/898-champagne-barthelemy-pinot-blanc-de-noirs-vintage-2018.html",
-        "producer_site": "",
-        "phone": "",
-        "status": "Producer not located; wine was OUT OF STOCK"
+        "url": "https://media.champagne-terroir.fr/1304-home_default/champagne-barthelemy-pinot-blanc-de-noirs-vintage-2018.jpg",
+        "hires": "https://media.champagne-terroir.fr/1304-large_default/champagne-barthelemy-pinot-blanc-de-noirs-vintage-2018.jpg",
+        "host": "champagne-terroir.fr",
+        "status": "VERIFIED (wine out of stock)"
       },
       "visit": null,
       "other_prices": []
@@ -290,18 +314,21 @@
       "professional_score": "2 STARS + COUP DE CŒUR — Guide Hachette 2026; 3 stars, 1001 Dégustations 2025",
       "score_tier": "verified",
       "headline_score": "2★ + Coup de Cœur",
+      "stars": 3,
+      "points": null,
+      "coup_de_coeur": true,
+      "rating_rank": 3.5,
       "medals": "Silver, Concours Mondial de Bruxelles 2026",
       "retailer_rating": null,
       "description": "The best-credentialled bottle on this list under €30, and one of only six wines named a coup de cœur 'pépite' by the Guide Hachette 2026 across all of France. The Chaput family has farmed vines near Bar-sur-Aube for more than two centuries — eight generations — with Jacky and his son Jason now working roughly 14 hectares on the right bank of the Aube. Pinot Noir makes up four-fifths of the plantings and 80% of this blend, stamping the wine with a deep golden colour and an unmistakably Pinot nose. Guide Hachette's tasters found damson, fig, apple and yellow fruit lifted by citrus and a faintly saline edge, carrying through to a harmonious, long palate with real structure and vinosity. Drink now or hold a few years.",
       "product_url": "https://www.hachette-vins.shop/champagne-jacques-chaput-brut-tradition-58651-fr-eur-fr.html",
       "verification_note": "STRONGEST CREDENTIALS UNDER €30. Often discounted to ~€20-21. Tasting note is Guide Hachette's, paraphrased",
-      "image_rights": {
+      "image": {
         "cuvee": "Brut Tradition",
-        "verified_url": "",
-        "product_page": "https://www.hachette-vins.shop/champagne-jacques-chaput-brut-tradition-58651-fr-eur-fr.html",
-        "producer_site": "https://www.jacques-chaput.com/",
-        "phone": "+33 3 25 27 00 14",
-        "status": "Producer runs its own shop - images will be on the site"
+        "url": "https://www.hachette-vins.shop/media/ef/9d/41/1766937657/019a2f9b58fe785688ba39258a6d4349.jpg?ts=1787043114",
+        "hires": "",
+        "host": "hachette-vins.shop",
+        "status": "VERIFIED"
       },
       "visit": {
         "name": "Champagne Jacques Chaput & Fils",
@@ -411,18 +438,21 @@
       "professional_score": "",
       "score_tier": "none",
       "headline_score": "",
+      "stars": null,
+      "points": null,
+      "coup_de_coeur": false,
+      "rating_rank": 0.0,
       "medals": "4 awards",
       "retailer_rating": 4.4,
       "description": "The most decorated bottle on this list by medal count. A Grand Cru blanc de noirs that trades finesse for power: ample texture, ripe orchard and stone fruit, a whisper of spice. Built for the table rather than the aperitif — white meats, roast chicken, mushroom dishes.",
       "product_url": "https://www.champagne-terroir.fr/en/francois-chaumont/592-champagne-francois-chaumont-blanc-de-noirs-brut-grand-cru.html",
       "verification_note": "Award count from retailer; awarding bodies not identified",
-      "image_rights": {
+      "image": {
         "cuvee": "Blanc de Noirs Brut Grand Cru",
-        "verified_url": "",
-        "product_page": "https://www.champagne-terroir.fr/en/francois-chaumont/592-champagne-francois-chaumont-blanc-de-noirs-brut-grand-cru.html",
-        "producer_site": "http://www.champagne-francois-chaumont.fr/",
-        "phone": "+33 6 17 96 20 33",
-        "status": "Ask grower"
+        "url": "https://media.champagne-terroir.fr/1071-home_default/champagne-francois-chaumont-blanc-de-noirs-brut-grand-cru.jpg",
+        "hires": "https://media.champagne-terroir.fr/1071-large_default/champagne-francois-chaumont-blanc-de-noirs-brut-grand-cru.jpg",
+        "host": "champagne-terroir.fr",
+        "status": "VERIFIED"
       },
       "visit": {
         "name": "Champagne François Chaumont",
@@ -450,18 +480,21 @@
       "professional_score": "",
       "score_tier": "none",
       "headline_score": "",
+      "stars": null,
+      "points": null,
+      "coup_de_coeur": false,
+      "rating_rank": 0.0,
       "medals": "",
       "retailer_rating": 4.9,
       "description": "Chouilly is the quiet Grand Cru at the northern gate of the Côte des Blancs, sitting alongside Avize, Cramant and Le Mesnil-sur-Oger but distinguished by a rarer soil: the region's classic chalk base topped with a layer of silt. Cyril Banchet is the third generation of his family here and works the entire estate single-handed, using only his own vines. No oak, no embellishment — fermentation in stainless steel to protect the Chardonnay's natural freshness, and a style built on restraint. The result marries chalky tension to a rounder, more generous mouthfeel, with the saline length the terroir is known for.",
       "product_url": "https://www.champagne-terroir.fr/en/cyril-banchet/727-champagne-cyrill-banchet-blanc-de-blancs-grand-cru.html",
       "verification_note": "No professional score found; producer detail verified",
-      "image_rights": {
+      "image": {
         "cuvee": "Blanc de Blancs Grand Cru",
-        "verified_url": "",
-        "product_page": "https://www.champagne-terroir.fr/en/cyril-banchet/727-champagne-cyrill-banchet-blanc-de-blancs-grand-cru.html",
-        "producer_site": "https://www.champagne-cyrillbanchet.fr/",
-        "phone": "+33 3 26 55 41 53",
-        "status": "Ask grower"
+        "url": "https://media.champagne-terroir.fr/872-home_default/champagne-cyrill-banchet-blanc-de-blancs-grand-cru.jpg",
+        "hires": "https://media.champagne-terroir.fr/872-large_default/champagne-cyrill-banchet-blanc-de-blancs-grand-cru.jpg",
+        "host": "champagne-terroir.fr",
+        "status": "VERIFIED"
       },
       "visit": {
         "name": "Champagne Cyrill Banchet",
@@ -489,18 +522,21 @@
       "professional_score": "3 STARS — Guide Hachette 2026 ('Exceptional Wine')",
       "score_tier": "verified",
       "headline_score": "3★ Guide Hachette",
+      "stars": 3,
+      "points": null,
+      "coup_de_coeur": false,
+      "rating_rank": 3.0,
       "medals": "",
       "retailer_rating": null,
       "description": "Three stars is the Guide Hachette's highest award, given to fewer than 2% of the wines its juries retain from blind tasting — the guide's equivalent of a gold medal. Pierre de Lune earns it as a pure Chardonnay of crystalline clarity: white flowers and citrus on the nose, a silky mouthfeel, and a deep saline finish. At this price, a three-star Champagne is close to an anomaly.",
       "product_url": "https://ed-champ.fr/gb/claude-baron/217-cuvee-pierre-de-lune-champagne-claude-baron-blanc-de-blancs.html",
       "verification_note": "HIGHEST HACHETTE RATING ON LIST. €29 was a discount from €33 — verify current price",
-      "image_rights": {
+      "image": {
         "cuvee": "Cuvée Pierre de Lune Blanc de Blancs",
-        "verified_url": "",
-        "product_page": "https://ed-champ.fr/gb/claude-baron/217-cuvee-pierre-de-lune-champagne-claude-baron-blanc-de-blancs.html",
-        "producer_site": "",
-        "phone": "",
-        "status": "Producer not yet located"
+        "url": "https://www.hachette-vins.shop/media/10/15/11/1766937622/0199c41d2fc97f70baba3213503b1c56.jpg?ts=1787004140",
+        "hires": "https://ed-champ.fr/1824-large_default/cuvee-pierre-de-lune-champagne-claude-baron-blanc-de-blancs.jpg",
+        "host": "hachette-vins.shop + ed-champ.fr",
+        "status": "VERIFIED (two sources)"
       },
       "visit": null,
       "other_prices": [
@@ -527,18 +563,21 @@
       "professional_score": "Listed in Guide Hachette des Vins",
       "score_tier": "listed",
       "headline_score": "Guide Hachette listed",
+      "stars": null,
+      "points": null,
+      "coup_de_coeur": false,
+      "rating_rank": 0.25,
       "medals": "3 awards",
       "retailer_rating": 5.0,
       "description": "One of the few growers on this list carried by the Guide Hachette des Vins. The estate sits at Verzenay, a Grand Cru of the Montagne de Reims near the famous windmill, and works without herbicides or insecticides across roughly five hectares — producing only about 15,000 bottles a year. Olivier Rousseaux took over in 1985 at nineteen; his daughter Juliette has since joined him. The Tradition is Pinot Noir-led and structured, balanced by Chardonnay for freshness, with 40% solera-aged reserve wine lending depth and 24 months on lees refining the texture. Guide Hachette found ripe fruit, honey and brioche on the nose and a delicate toasted palate, both fresh and round.",
       "product_url": "https://www.champagne-terroir.fr/en/olivier-rousseaux/934-champagne-olivier-rousseaux-tradition-grand-cru.html",
       "verification_note": "Guide Hachette listing verified; star rating not confirmed. Tasting note is Guide Hachette's, paraphrased",
-      "image_rights": {
+      "image": {
         "cuvee": "Tradition Grand Cru",
-        "verified_url": "",
-        "product_page": "https://www.champagne-terroir.fr/en/olivier-rousseaux/934-champagne-olivier-rousseaux-tradition-grand-cru.html",
-        "producer_site": "http://www.champagne-olivier-rousseaux.fr/",
-        "phone": "+33 3 26 49 40 50",
-        "status": "Ask grower"
+        "url": "https://media.champagne-terroir.fr/1355-home_default/champagne-olivier-rousseaux-tradition-grand-cru.jpg",
+        "hires": "https://media.champagne-terroir.fr/1355-large_default/champagne-olivier-rousseaux-tradition-grand-cru.jpg",
+        "host": "champagne-terroir.fr",
+        "status": "VERIFIED"
       },
       "visit": {
         "name": "Champagne Olivier Rousseaux",
@@ -565,19 +604,22 @@
       "price_eur": 33.9,
       "professional_score": "94 pts (critic aggregate); 97 pts Decanter",
       "score_tier": "verified",
-      "headline_score": "94 pts (Decanter)",
+      "headline_score": "97 pts (Decanter)",
+      "stars": null,
+      "points": 97,
+      "coup_de_coeur": false,
+      "rating_rank": 2.8,
       "medals": "Decanter World Wine Awards PLATINUM medal",
       "retailer_rating": null,
       "description": "The wine that topped Wine-Searcher's best-value Champagne ranking for 2026. A family house at Sacy, founded in 1948 and now run by the third generation across 6.5 hectares in the Petite Montagne de Reims. Entirely Pinot Noir, vinified in stainless steel on clay-limestone soils, with 57% reserve wine in the blend and two years on lees. At 3 g/L the dosage sits in extra brut territory while keeping the roundness of a brut. Decanter awarded it a Platinum medal and 97 points, describing baked apple, white chocolate and butterscotch over brioche and almond, with rich flavours carried by fresh acidity and a long finish. Drink over about five years; serve at 8–9°C.",
       "product_url": "https://www.champagne-terroir.fr/en/andre-chemin/178-andre-chemin-champagne-brut-tradition.html",
       "verification_note": "Best-documented wine on the list. Decanter award from 2019 release",
-      "image_rights": {
-        "cuvee": "Tradition 1er Cru (Little Dark Mountain)",
-        "verified_url": "https://media.champagne-terroir.fr/146-large_default/andre-chemin-champagne-brut-tradition.jpg",
-        "product_page": "https://www.champagne-terroir.fr/en/andre-chemin/178-andre-chemin-champagne-brut-tradition.html",
-        "producer_site": "http://www.champagneandrechemin.fr/",
-        "phone": "+33 3 26 49 22 42",
-        "status": "VERIFIED"
+      "image": {
+        "cuvee": "Tradition 1er Cru",
+        "url": "https://media.champagne-terroir.fr/146-large_default/andre-chemin-champagne-brut-tradition.jpg",
+        "hires": "https://media.champagne-terroir.fr/146-large_default/andre-chemin-champagne-brut-tradition.jpg",
+        "host": "champagne-terroir.fr",
+        "status": "VERIFIED (og:image)"
       },
       "visit": {
         "name": "Champagne André Chemin",
@@ -651,18 +693,21 @@
       "professional_score": "2 STARS — Guide Hachette ('Remarkable Wine')",
       "score_tier": "verified",
       "headline_score": "2★ Guide Hachette",
+      "stars": 2,
+      "points": null,
+      "coup_de_coeur": false,
+      "rating_rank": 2.0,
       "medals": "",
       "retailer_rating": null,
       "description": "An established Épernay house whose Brut Bleu carries two Guide Hachette stars, marking it a 'remarkable wine' for balance and typicity. Besserat is known for an unusually fine, creamy mousse achieved through its own tirage method — a house style built on lightness rather than power.",
       "product_url": "https://ed-champ.fr/gb/besserat-de-bellefon/264-champagne-besserat-de-bellefon-brut-bleu.html",
       "verification_note": "€34.70 was a discount from €38.50 — verify current price. Hachette edition year not confirmed",
-      "image_rights": {
+      "image": {
         "cuvee": "Bleu Brut",
-        "verified_url": "",
-        "product_page": "https://ed-champ.fr/gb/besserat-de-bellefon/264-champagne-besserat-de-bellefon-brut-bleu.html",
-        "producer_site": "https://www.besseratdebellefon.com/",
-        "phone": "+33 3 26 78 52 16",
-        "status": "Established house - likely has a proper press kit. Ask for it"
+        "url": "",
+        "hires": "",
+        "host": "ed-champ.fr",
+        "status": "NOT FOUND - open the product page and copy the image address"
       },
       "visit": {
         "name": "Champagne Besserat de Bellefon",
@@ -736,18 +781,21 @@
       "professional_score": "Producer listed in Guide Hachette des Vins",
       "score_tier": "listed",
       "headline_score": "Guide Hachette listed",
+      "stars": null,
+      "points": null,
+      "coup_de_coeur": false,
+      "rating_rank": 0.25,
       "medals": "",
       "retailer_rating": null,
       "description": "A single-harvest blanc de noirs from the same Verzenay Grand Cru estate, and the most ambitious bottle here. Verzenay is Pinot Noir country in the truest sense — chalk slopes that give the grape structure and tension rather than sheer weight. From an estate making only around 15,000 bottles a year in total, this is a genuinely small-production wine.",
       "product_url": "https://www.champagne-terroir.fr/en/olivier-rousseaux/942-champagne-olivier-rousseaux-blanc-de-noirs-harvest-2022-grand-cru.html",
       "verification_note": "Guide Hachette listing applies to the producer, not confirmed for this cuvée",
-      "image_rights": {
-        "cuvee": "Tradition Grand Cru",
-        "verified_url": "",
-        "product_page": "https://www.champagne-terroir.fr/en/olivier-rousseaux/934-champagne-olivier-rousseaux-tradition-grand-cru.html",
-        "producer_site": "http://www.champagne-olivier-rousseaux.fr/",
-        "phone": "+33 3 26 49 40 50",
-        "status": "Ask grower"
+      "image": {
+        "cuvee": "Blanc de Noirs Harvest 2022 Grand Cru",
+        "url": "https://media.champagne-terroir.fr/1363-home_default/champagne-olivier-rousseaux-blanc-de-noirs-harvest-2022-grand-cru.jpg",
+        "hires": "https://media.champagne-terroir.fr/1363-large_default/champagne-olivier-rousseaux-blanc-de-noirs-harvest-2022-grand-cru.jpg",
+        "host": "champagne-terroir.fr",
+        "status": "VERIFIED"
       },
       "visit": {
         "name": "Champagne Olivier Rousseaux",
