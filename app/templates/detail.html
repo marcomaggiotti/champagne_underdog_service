@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}{{ wine.producer }} {{ wine.cuvee }} — Champagne Underdogs{% endblock %}
+{% block content %}
+<nav class="crumbs"><a href="/">← All sixteen</a></nav>
+
+<article class="wine">
+  <div class="wine-figure" style="--accent: {{ accent_of(wine) }}">
+    {{ bottle(wine, width=190, height=600, decorative=False) }}
+  </div>
+
+  <div class="wine-main">
+    <header>
+      <p class="eyebrow">No. {{ wine.id }} of 16</p>
+      <h1>{{ wine.producer }}<span>{{ wine.cuvee }}</span></h1>
+      <div class="wine-head">
+        <span class="price big">{{ wine.price_eur | price }}</span>
+        {% if wine.score_tier == 'verified' %}
+          <span class="score verified">{{ wine.headline_score }}</span>
+        {% elif wine.score_tier == 'listed' %}
+          <span class="score listed">Hachette listed<em>stars unconfirmed</em></span>
+        {% else %}
+          <span class="score empty">No professional rating found</span>
+        {% endif %}
+      </div>
+    </header>
+
+    {% if wine.description %}<p class="prose">{{ wine.description }}</p>{% endif %}
+
+    <dl class="facts">
+      {% if wine.classification %}<div><dt>Classification</dt><dd>{{ wine.classification }}</dd></div>{% endif %}
+      {% if wine.village %}<div><dt>Village / region</dt><dd>{{ wine.village }}</dd></div>{% endif %}
+      {% if wine.style %}<div><dt>Style &amp; grapes</dt><dd>{{ wine.style }}</dd></div>{% endif %}
+      <div><dt>Price at the property</dt><dd>{{ wine.price_eur | price }} <span class="thin">75cl</span></dd></div>
+      {% if wine.professional_score %}<div><dt>Professional rating</dt><dd>{{ wine.professional_score }}</dd></div>{% endif %}
+      {% if wine.medals %}<div><dt>Medals &amp; awards</dt><dd>{{ wine.medals }}</dd></div>{% endif %}
+    </dl>
+
+    {% if wine.retailer_rating %}
+    <p class="aside">
+      <strong>{{ wine.retailer_rating }}/5</strong> from customers at Champagne Terroir.
+      This is a shop's own customer rating, not a professional score, and is kept
+      separate from one for that reason.
+    </p>
+    {% endif %}
+
+    {# The honest bit. Every claim above is only as good as this note, so it is shown
+       rather than filed away in the spreadsheet it came from. #}
+    {% if wine.verification_note %}
+    <div class="verify">
+      <h2>What was and was not verified</h2>
+      <p>{{ wine.verification_note }}</p>
+    </div>
+    {% endif %}
+
+    {% if wine.visit %}
+    <section class="block">
+      <h2>Visiting {{ wine.visit.name }}</h2>
+      <dl class="facts">
+        {% if wine.visit.address %}<div><dt>Address</dt><dd>{{ wine.visit.address }}</dd></div>{% endif %}
+        {% if wine.visit.region %}<div><dt>Sub-region</dt><dd>{{ wine.visit.region }}</dd></div>{% endif %}
+        {% if wine.visit.phone %}<div><dt>Phone</dt><dd><a href="tel:{{ wine.visit.phone | replace(' ', '') }}">{{ wine.visit.phone }}</a></dd></div>{% endif %}
+        {% if wine.visit.hours %}<div><dt>Opening hours</dt><dd>{{ wine.visit.hours }}</dd></div>{% endif %}
+        {% if wine.visit.booking_risk %}<div><dt>Booking</dt><dd>{{ wine.visit.booking_risk }}</dd></div>{% endif %}
+      </dl>
+      <p class="links">
+        {% if wine.visit.website %}<a href="{{ wine.visit.website }}" target="_blank" rel="noopener noreferrer">Producer website ↗</a>{% endif %}
+        {% if wine.visit.lat and wine.visit.lon %}
+          <a href="https://www.openstreetmap.org/?mlat={{ wine.visit.lat }}&mlon={{ wine.visit.lon }}#map=15/{{ wine.visit.lat }}/{{ wine.visit.lon }}"
+             target="_blank" rel="noopener noreferrer">Show on a map ↗</a>
+        {% endif %}
+      </p>
+    </section>
+    {% endif %}
+
+    {% if wine.other_prices %}
+    <section class="block">
+      <h2>What it costs elsewhere</h2>
+      <p class="thin">Recorded during research. Sale prices move; re-check before relying on any of these.</p>
+      <div class="scroller">
+        <table>
+          <thead><tr><th>Retailer</th><th>Country</th><th>Price</th><th>Note</th></tr></thead>
+          <tbody>
+          {% for row in wine.other_prices %}
+            <tr>
+              <td>{% if row.url %}<a href="{{ row.url }}" target="_blank" rel="noopener noreferrer">{{ row.retailer }}</a>{% else %}{{ row.retailer }}{% endif %}</td>
+              <td>{{ row.country or '—' }}</td>
+              <td class="num">{{ row.price or '—' }}</td>
+              <td class="thin">{{ row.notes }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    {% endif %}
+
+    <section class="block">
+      <h2>About this bottle image</h2>
+      <p>
+        The bottle above is an illustration, not a photograph of this wine. Retailer and
+        producer photographs belong to whoever took them, and hotlinking them would also
+        break the moment the host changed a path.
+        {% if wine.image_rights.status %}<br><span class="thin">Status: {{ wine.image_rights.status }}</span>{% endif %}
+      </p>
+      <p class="links">
+        {% if wine.image_rights.producer_site %}<a href="{{ wine.image_rights.producer_site }}" target="_blank" rel="noopener noreferrer">Ask the producer for images ↗</a>{% endif %}
+        {% if wine.image_rights.product_page %}<a href="{{ wine.image_rights.product_page }}" target="_blank" rel="noopener noreferrer">See the real bottle ↗</a>{% endif %}
+        {% if wine.image_rights.phone %}<span class="thin">{{ wine.image_rights.phone }}</span>{% endif %}
+      </p>
+    </section>
+
+    {% if wine.product_url %}
+    <p class="source">
+      Researched from <a href="{{ wine.product_url }}" target="_blank" rel="noopener noreferrer">the retailer's page ↗</a>.
+      We do not sell this wine and earn nothing from that link.
+    </p>
+    {% endif %}
+  </div>
+</article>
+
+<nav class="pager">
+  {% if previous %}<a class="prev" href="/champagne/{{ previous.slug }}">← {{ previous.producer }}<em>{{ previous.price_eur | price }}</em></a>{% else %}<span></span>{% endif %}
+  {% if next %}<a class="next" href="/champagne/{{ next.slug }}">{{ next.producer }} →<em>{{ next.price_eur | price }}</em></a>{% endif %}
+</nav>
+{% endblock %}

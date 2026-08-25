@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Sixteen Champagnes that punch above their price</h1>
+  <p class="lead">
+    Grower Champagnes — made by the family that farms the vines, not bought in and
+    blended — researched, priced and credentialled. All under €40 at the property.
+  </p>
+  <dl class="figures">
+    <div><dt>Wines</dt><dd>{{ wines | length }}</dd></div>
+    <div><dt>From</dt><dd>{{ cheapest | price }}</dd></div>
+    <div><dt>To</dt><dd>{{ dearest | price }}</dd></div>
+    <div><dt>With a verified rating</dt><dd>{{ rated }}</dd></div>
+  </dl>
+</section>
+
+<section class="legend">
+  <h2>How to read the ratings</h2>
+  <ul>
+    <li><span class="score verified">2★ Guide Hachette</span>
+      A professional rating that could be verified — Guide Hachette stars, or a critic's
+      point score. {{ notes['Guide Hachette scale'] }}</li>
+    <li><span class="score listed">Hachette listed<em>stars unconfirmed</em></span>
+      The wine appears in the guide, but the star count could not be confirmed. Treated
+      as unrated until it can be.</li>
+    <li><span class="score retailer">4.6/5<em>customers</em></span>
+      A retailer's own customer rating. Not a professional score, and shown apart from
+      one deliberately.</li>
+    <li><span class="score empty">No rating found</span>
+      No professional rating was found. None is implied.</li>
+  </ul>
+</section>
+
+<section class="grid" aria-label="The sixteen Champagnes, cheapest first">
+  {% for wine in wines %}{% include "_card.html" %}{% endfor %}
+</section>
+{% endblock %}

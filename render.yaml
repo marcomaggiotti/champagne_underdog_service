@@ -1,0 +1,24 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+#
+# One web service. From the Render dashboard: New -> Blueprint -> point at this repo.
+#
+# It needs nothing configured to run: the catalogue is committed as data/champagnes.json
+# and read at startup, so there is no database, no API key and no external call. If that
+# file is missing or empty the health check fails rather than the site quietly serving an
+# empty gallery.
+#
+# The free plan sleeps after 15 minutes idle and takes ~50s to wake, which for a
+# showcase is fine - but the first visitor after a quiet spell waits.
+services:
+  - type: web
+    name: champagne-underdogs
+    runtime: python
+    plan: free
+    region: frankfurt          # the audience and the growers are both in Europe
+    buildCommand: pip install -r requirements.txt
+    # $PORT is assigned by Render; binding to a fixed port fails the health check.
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"

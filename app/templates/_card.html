@@ -1,0 +1,33 @@
+{# One wine in the grid. The rating is rendered by tier, never as a bare number:
+   the workbook distinguishes a verified professional score from a Guide Hachette
+   listing whose star count nobody could confirm, and says of the rest "Do not imply
+   one". Flattening the three into a single score would overstate eleven of sixteen. #}
+<a class="card" href="/champagne/{{ wine.slug }}">
+  <div class="card-bottle" style="--accent: {{ accent_of(wine) }}">
+    {{ bottle(wine, width=104, height=330) }}
+  </div>
+  <div class="card-body">
+    <h2 class="card-name">
+      <span class="producer">{{ wine.producer }}</span>
+      <span class="cuvee">{{ wine.cuvee }}</span>
+    </h2>
+
+    <div class="card-foot">
+      <span class="price">{{ wine.price_eur | price }}</span>
+      {% if wine.score_tier == 'verified' %}
+        <span class="score verified" title="{{ wine.professional_score }}">{{ wine.headline_score }}</span>
+      {% elif wine.score_tier == 'listed' %}
+        <span class="score listed" title="{{ wine.professional_score }}">Hachette listed<em>stars unconfirmed</em></span>
+      {% elif wine.retailer_rating %}
+        <span class="score retailer" title="Champagne Terroir customer rating, not a professional score">{{ wine.retailer_rating }}/5<em>customers</em></span>
+      {% else %}
+        <span class="score empty">No rating found</span>
+      {% endif %}
+    </div>
+
+    <p class="card-meta">
+      {% if wine.classification %}<span class="chip cru">{{ wine.classification }}</span>{% endif %}
+      <span class="chip">{{ wine.style }}</span>
+    </p>
+  </div>
+</a>

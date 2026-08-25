@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Champagne Underdogs{% endblock %}</title>
+<meta name="description" content="Sixteen grower Champagnes under €40, researched and showcased. Not a shop.">
+<link rel="stylesheet" href="/static/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🍾</text></svg>">
+</head>
+<body>
+
+<!--
+  The gate is rendered by the server and removed by script once a visitor has confirmed.
+  That order matters: if it were drawn by script, the page would flash its contents
+  before the gate arrived, and with scripting disabled it would never arrive at all.
+  Here, no script means the gate simply stays.
+-->
+<div id="age-gate" class="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+  <div class="gate-card">
+    <p class="gate-mark">🍾</p>
+    <h1 id="gate-title">Are you 18 or over?</h1>
+    <p class="gate-lead">
+      This site shows alcoholic drinks. Please confirm you are of legal drinking age
+      in your country before continuing.
+    </p>
+    <p class="gate-note">
+      <strong>This site does not sell anything.</strong> It is a showcase only — there is
+      no shop, no basket and no way to order. Prices are research figures, recorded on a
+      stated date, shown so you can see what a bottle costs at the property. To buy any
+      of these wines, contact the grower directly.
+    </p>
+    <div class="gate-actions">
+      <button id="gate-yes" class="btn primary" autofocus>Yes, I am 18 or over</button>
+      <button id="gate-no" class="btn">No</button>
+    </div>
+    <p id="gate-refused" class="gate-refused" hidden>
+      Thank you for your honesty — you cannot view this site yet. Come back when you are
+      of legal drinking age.
+    </p>
+  </div>
+</div>
+
+<div id="site" class="site" hidden>
+  <header class="masthead">
+    <a class="wordmark" href="/">
+      <span class="wordmark-mark">🍾</span>
+      <span>
+        <strong>Champagne Underdogs</strong>
+        <em>Sixteen growers under €40</em>
+      </span>
+    </a>
+    <p class="masthead-note">Showcase only — nothing here is for sale</p>
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <footer class="foot">
+    <p>
+      <strong>Not a shop.</strong> This site showcases wines and does not sell them,
+      take orders, or act as an intermediary. To buy, contact the grower.
+    </p>
+    <p>
+      Prices in EUR for a 75cl bottle, retrieved 25 August 2026 from the retailers named
+      on each page. Several were sale prices. Re-verify before relying on any of them.
+    </p>
+    <p>
+      Bottle images are drawn, not photographed — see the image note on any wine's page.
+      Ratings are shown only where they could be evidenced; where none was found, none
+      is implied.
+    </p>
+    <p class="foot-thin">Please enjoy responsibly.</p>
+  </footer>
+</div>
+
+<script src="/static/age-gate.js"></script>
+</body>
+</html>

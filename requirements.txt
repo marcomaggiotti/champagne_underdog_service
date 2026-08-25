@@ -1,0 +1,7 @@
+fastapi>=0.110
+uvicorn[standard]>=0.27
+jinja2>=3.1
+# Only needed to regenerate data/champagnes.json from the workbook; the service itself
+# never reads the spreadsheet. Kept here so `scripts/import_xlsx.py` works in a fresh
+# checkout without a second requirements file.
+openpyxl>=3.1
