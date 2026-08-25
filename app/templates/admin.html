@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Add a Champagne — Champagne Underdogs{% endblock %}
+
+{# The one input that is not on this form is the rating tier. You type the credential as
+   it is written on the guide, and the tier, the rank and the badge are read off it -
+   because "verified" is supposed to mean somebody verified it, and a tick-box marked
+   verified is just a way of saying so without having done it. #}
+{% macro field(name, label, hint='', kind='text', required=False, extra='') %}
+<p class="field{% if kind == 'textarea' %} wide{% endif %}{% if errors.get(name) %} bad{% endif %}">
+  <label for="f-{{ name }}">{{ label }}{% if required %} <span class="req">required</span>{% endif %}</label>
+  {% if kind == 'textarea' %}
+    <textarea id="f-{{ name }}" name="{{ name }}" rows="3">{{ values[name] }}</textarea>
+  {% else %}
+    <input id="f-{{ name }}" name="{{ name }}" type="{{ kind }}" value="{{ values[name] }}"
+           {% if required %}required{% endif %} {{ extra }}>
+  {% endif %}
+  {% if errors.get(name) %}<em class="bad-note">{{ errors[name] }}</em>
+  {% elif hint %}<em class="hint">{{ hint }}</em>{% endif %}
+</p>
+{% endmacro %}
+
+{% block content %}
+<nav class="crumbs"><a href="/">← Back to the gallery</a></nav>
+
+<section class="hero">
+  <h1>Add a Champagne</h1>
+  <p class="lead">
+    A wine filed here joins the gallery immediately — it is written straight into the
+    catalogue. Producer, cuvée and price are all it needs; everything else fills out its
+    page, and the coordinates put it on the map.
+  </p>
+</section>
+
+{% if added %}
+<p class="flash">
+  <strong>{{ added.producer }} {{ added.cuvee }}</strong> is on the list, at
+  {{ added.price_eur | price }} — number {{ added.id }} of {{ total_wines() }}.
+  <a href="/champagne/{{ added.slug }}">See its page →</a>
+</p>
+{% endif %}
+
+{% if errors %}
+<p class="flash bad">
+  <strong>Nothing was saved.</strong> {{ errors | length }}
+  {{ 'field needs' if errors | length == 1 else 'fields need' }} another look — they are
+  marked below, and everything you typed is still here.
+</p>
+{% endif %}
+
+<form class="adminform" method="post" action="/admin">
+  <fieldset>
+    <legend>The wine</legend>
+    <div class="fields">
+      {{ field('producer', 'Producer', 'The family, as they write it — “Jacques Chaput”.', required=True) }}
+      {{ field('cuvee', 'Cuvée', 'The bottling — “Brut Tradition”.', required=True) }}
+      {{ field('price_eur', 'Price at the property (EUR)', '75cl, in euros. 26.50, not “about €26”.', required=True, extra='inputmode="decimal"') }}
+      {{ field('village', 'Village / region', 'Where the vines are — “Chouilly, Côte des Blancs”.') }}
+      {{ field('classification', 'Classification', 'Grand Cru, 1er Cru, or leave it empty.') }}
+      {{ field('style', 'Style &amp; grapes' | safe, 'Brut, Blanc de Blancs, “100% Pinot Noir, 3 g/L”.') }}
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>What it has won</legend>
+    <p class="fieldnote">
+      Type the credential exactly as the guide states it — “2 stars + Coup de Cœur, Guide
+      Hachette 2026”, “97 pts Decanter”. The badge, the tier and the wine’s place in the
+      running order are all read from this one line, by the same code that reads the
+      workbook. Leave it empty and the wine shows “No rating found”, which is the honest
+      default and not a penalty.
+    </p>
+    <div class="fields">
+      {{ field('professional_score', 'Professional rating', 'A star count or a point score is a rating. “Guide Hachette 2026 (listed)” is a listing, and is shown as one.') }}
+      {{ field('medals', 'Medals &amp; awards' | safe, 'Concours Mondial de Bruxelles, gold at Épernay, and so on.') }}
+      {{ field('retailer_rating', 'Retailer’s customer rating' | safe, 'Out of 5. Shown apart from a professional score, because it is not one.', extra='inputmode="decimal"') }}
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>The words on its page</legend>
+    <div class="fields">
+      {{ field('description', 'Description', 'A paragraph, ready to publish.', kind='textarea') }}
+      {{ field('verification_note', 'What was and was not verified', 'The honest note. Shown on the page, exactly as typed.', kind='textarea') }}
+      {{ field('product_url', 'Product URL', 'Where the price was found. http:// or https://.', kind='url') }}
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>The bottle photograph</legend>
+    <p class="fieldnote">
+      Optional, and a drawn bottle stands in when there is none. A photograph you link to
+      is hotlinked until <code>scripts/fetch_images.py</code> downloads it, and it belongs
+      to whoever published it either way.
+    </p>
+    <div class="fields">
+      {{ field('image_url', 'Image URL', 'The bottle shot. http:// or https://.', kind='url') }}
+      {{ field('image_status', 'Source status', 'How sure you are of it — “VERIFIED”, “needs re-checking”.') }}
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Visiting, and the map</legend>
+    <p class="fieldnote">
+      Latitude and longitude are what put the house on the map on the front page — both,
+      or neither. Right-click the property in Google Maps and “What’s here?” gives you the
+      pair, e.g. <code>49.04</code> and <code>3.96</code>.
+    </p>
+    <div class="fields">
+      {{ field('visit_name', 'House name', 'Defaults to “Champagne” and the producer.') }}
+      {{ field('visit_address', 'Address', 'Street, postcode and village.') }}
+      {{ field('visit_region', 'Sub-region', '“Verzenay, Montagne de Reims (Grand Cru)”.') }}
+      {{ field('visit_phone', 'Phone', 'With the country code.', kind='tel') }}
+      {{ field('visit_website', 'Website', 'http:// or https://.', kind='url') }}
+      {{ field('visit_hours', 'Opening hours', 'As published. “No published hours” is an answer.') }}
+      {{ field('visit_credential', 'Credential', 'What recommends a visit — “5.0 stars; organic”.') }}
+      {{ field('visit_booking_risk', 'Booking', 'How hard it is to get in — “HIGH — works alone, must book”.') }}
+      {{ field('visit_lat', 'Latitude', '49.04', extra='inputmode="decimal"') }}
+      {{ field('visit_lon', 'Longitude', '3.96', extra='inputmode="decimal"') }}
+    </div>
+  </fieldset>
+
+  <p class="adminactions">
+    <button type="submit" class="btn primary">Add it to the list</button>
+    <a class="btn" href="/">Cancel</a>
+  </p>
+</form>
+
+<section class="block">
+  <h2>The list as it stands</h2>
+  <p class="thin">{{ catalogue | length }} wines, cheapest first — the order the file keeps.</p>
+  <div class="scroller">
+    <table>
+      <thead><tr><th>#</th><th>Producer</th><th>Cuvée</th><th>Price</th><th>Rating</th><th>On the map</th></tr></thead>
+      <tbody>
+        {% for wine in catalogue %}
+        <tr>
+          <td class="num">{{ wine.id }}</td>
+          <td><a href="/champagne/{{ wine.slug }}">{{ wine.producer }}</a></td>
+          <td>{{ wine.cuvee }}</td>
+          <td class="num">{{ wine.price_eur | price }}</td>
+          <td class="thin">{{ wine.headline_score or '—' }}</td>
+          <td class="thin">{{ 'yes' if wine.visit and wine.visit.lat is not none else 'no' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

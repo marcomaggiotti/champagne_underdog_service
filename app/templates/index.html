@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="hero">
-  <h1>Sixteen Champagnes that punch above their price</h1>
+  <h1>{{ wines | length | words | capitalize }} Champagnes that punch above their price</h1>
   <p class="lead">
     Grower Champagnes — made by the family that farms the vines, not bought in and
     blended — researched, priced and credentialled. All under €40 at the property.
@@ -47,7 +47,13 @@
 </p>
 {% endif %}
 
-<section class="grid" aria-label="The sixteen Champagnes">
+<section class="grid" aria-label="Every Champagne on the list">
   {% for wine in wines %}{% include "_card.html" %}{% endfor %}
 </section>
+
+{% include "_map.html" %}
+{% endblock %}
+
+{% block scripts %}
+{% if houses and maps_key %}<script src="/static/map.js"></script>{% endif %}
 {% endblock %}

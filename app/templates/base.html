@@ -4,12 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block title %}Champagne Underdogs{% endblock %}</title>
-<meta name="description" content="Sixteen grower Champagnes under €40, researched and showcased. Not a shop.">
+<meta name="description" content="Grower Champagnes under €40, researched and showcased, with a map of the houses. Not a shop.">
 <link rel="stylesheet" href="/static/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🍾</text></svg>">
 </head>
 <body>
 
+{# The gate stands in front of the public site. It does not stand in front of /admin:
+   that page is behind a password, and someone who has typed one is an operator rather
+   than a passing visitor. It would also be unusable there - "no script means the gate
+   stays" is the right way to fail for a showcase and the wrong way to fail for the form
+   the showcase is edited with. #}
+{% set gated = gated if gated is defined else True %}
+{% if gated %}
 <!--
   The gate is rendered by the server and removed by script once a visitor has confirmed.
   That order matters: if it were drawn by script, the page would flash its contents
@@ -40,14 +47,15 @@
     </p>
   </div>
 </div>
+{% endif %}
 
-<div id="site" class="site" hidden>
+<div id="site" class="site"{% if gated %} hidden{% endif %}>
   <header class="masthead">
     <a class="wordmark" href="/">
       <span class="wordmark-mark">🍾</span>
       <span>
         <strong>Champagne Underdogs</strong>
-        <em>Sixteen growers under €40</em>
+        <em>{{ total_wines() | words | capitalize }} growers under €40</em>
       </span>
     </a>
     <p class="masthead-note">Showcase only — nothing here is for sale</p>
@@ -74,5 +82,8 @@
 </div>
 
 <script src="/static/age-gate.js"></script>
+{# After the gate, always: anything in here may need a page that is actually laid out,
+   and the gate is what reveals it. #}
+{% block scripts %}{% endblock %}
 </body>
 </html>

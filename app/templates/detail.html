@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}{{ wine.producer }} {{ wine.cuvee }} — Champagne Underdogs{% endblock %}
 {% block content %}
-<nav class="crumbs"><a href="/">← All sixteen</a></nav>
+<nav class="crumbs"><a href="/">← All {{ total_wines() | words }}</a></nav>
 
 <article class="wine">
   {% set photo = photo_for(wine, hires=True) %}
@@ -16,7 +16,7 @@
 
   <div class="wine-main">
     <header>
-      <p class="eyebrow">No. {{ wine.id }} of 16</p>
+      <p class="eyebrow">No. {{ wine.id }} of {{ total_wines() }}</p>
       <h1>{{ wine.producer }}<span>{{ wine.cuvee }}</span></h1>
       <div class="wine-head">
         <span class="price big">{{ wine.price_eur | price }}</span>

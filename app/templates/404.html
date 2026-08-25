@@ -4,6 +4,6 @@
 <section class="hero">
   <h1>No such bottle</h1>
   <p class="lead">{{ detail }}</p>
-  <p><a class="btn primary" href="/">Back to all sixteen</a></p>
+  <p><a class="btn primary" href="/">Back to all {{ total_wines() | words }}</a></p>
 </section>
 {% endblock %}

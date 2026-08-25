@@ -17,17 +17,78 @@ uvicorn app.main:app --reload        # http://127.0.0.1:8000
 
 | Route | What it is |
 | --- | --- |
-| `/` | the gallery — bottle, name, price and rating for each wine |
+| `/` | the gallery — bottle, name, price and rating for each wine, and a map of the growers |
 | `/champagne/{slug}` | one wine in full: description, facts, what was verified, visiting details, prices elsewhere |
+| `/admin` | add a wine to the list. **Behind a login** — see below |
 | `/api/champagnes` | the catalogue as JSON, the same data the pages render from |
+| `/api/winehouses` | the map's pins: one per house, with whichever of its wines are on the list |
 | `/health` | Render's health check; reports how many wines loaded |
+
+## Adding a wine
+
+`/admin` is a form that writes straight into `data/champagnes.json`; the wine is in the
+gallery on the next request. It is behind HTTP Basic auth:
+
+| | |
+| --- | --- |
+| user | `admin` |
+| password | `maorvelous` |
+
+**Change them before this is reachable from the internet.** That pair is the default
+because it was the one asked for, and it is written down in a public repository, which
+makes it a published password rather than a secret one. `ADMIN_USER` and
+`ADMIN_PASSWORD` override it, and `render.yaml` asks Render for both:
+
+```bash
+ADMIN_USER=marco ADMIN_PASSWORD='something nobody has read' uvicorn app.main:app
+```
+
+**On Render's free plan, a wine added through the form does not survive a deploy.** The
+disk is ephemeral and the checkout goes back to what is committed. Two ways out: mount a
+persistent disk and point `CHAMPAGNE_DATA` at a file on it, or use the form to draft the
+wine, then copy `data/champagnes.json` back into the repo and commit it.
+
+One thing the form deliberately cannot do is assert a rating. There is no "tier" control:
+you type the credential as the guide states it — *"2 stars + Coup de Cœur, Guide Hachette
+2026"* — and the tier, the ranking and the badge are read off that text by
+`app/ratings.py`, which is the same code the workbook importer uses. A gold badge is
+supposed to mean somebody verified a rating; a tick-box marked "verified" would be a way
+of claiming one without having done so. Leave the field empty and the wine reads "No
+rating found", which is the honest answer and costs it nothing but its place in the
+order.
+
+## The map
+
+The front page maps every grower whose address the workbook confirmed — nine houses, one
+pin each. Three of the sixteen wines come from Olivier Rousseaux's cellar in Verzenay, so
+the pins are grouped by address rather than drawn per wine; a pin's info window lists
+whichever of its wines are on the list.
+
+Google Maps needs an API key. Set `GOOGLE_MAPS_API_KEY` and the map appears:
+
+```bash
+GOOGLE_MAPS_API_KEY=AIza... uvicorn app.main:app --reload
+```
+
+Without one, the page says the map is switched off and shows the same houses as a list of
+addresses, phone numbers and Google Maps links. That list is always rendered, under the
+map when there is one: it is the part that survives a blocked script, a spent quota and
+scripting switched off, and an address and a phone number are what you actually need in
+order to visit somebody. A keyless Google map is a grey rectangle stamped *"for
+development purposes only"*, which is worse than no map at all.
+
+Google's script is only fetched once a visitor has confirmed their age — the map sits
+inside the gated part of the page, and a map initialised inside a hidden element measures
+zero and renders grey for good. So it waits for the gate to lift, which also means a
+visitor who never confirms never loads anything from Google.
 
 ## Deploying
 
-`render.yaml` is a Render Blueprint. New → Blueprint → point it at this repo. Nothing
-needs configuring: the catalogue is committed, so there is no database, no key and no
-external call. On the free plan the service sleeps after 15 minutes idle and takes about
-50 seconds to wake.
+`render.yaml` is a Render Blueprint. New → Blueprint → point it at this repo. The public
+site needs nothing configured: the catalogue is committed, so there is no database and no
+external call. Set `GOOGLE_MAPS_API_KEY` for the map and `ADMIN_USER` / `ADMIN_PASSWORD`
+for the form — the Blueprint asks for all three. On the free plan the service sleeps after
+15 minutes idle and takes about 50 seconds to wake.
 
 ## Updating the wines
 
@@ -119,9 +180,13 @@ shoot your own bottles on the buying trip. Each wine's page links to its produce
 ```
 app/
   main.py          FastAPI: gallery, detail, health, JSON
+  catalogue.py     the catalogue file - reading it, adding to it, writing it back
+  admin.py         /admin: the login and the add form
+  ratings.py       credential text -> tier, rank and badge (shared with the importer)
+  winehouses.py    wines -> one map pin per address
   bottles.py       the SVG bottle generator
-  templates/       base (with the age gate), index, detail, 404
-  static/          style.css, age-gate.js
+  templates/       base (with the age gate), index, detail, admin, the map, 404
+  static/          style.css, age-gate.js, map.js
   static/bottles/  downloaded photographs (empty until you fetch them)
 data/champagnes.json   the catalogue
 scripts/import_xlsx.py workbook -> catalogue
@@ -141,3 +206,11 @@ The workbook flags two things this repo cannot decide for you:
 - **Check your jurisdiction's rules on alcohol advertising and age-gating.** The gate
   here is a self-declaration stored in the visitor's browser, which is the common
   approach but not the same thing as verification.
+- **Change the `/admin` password**, and know what the login is and is not. HTTP Basic
+  sends the password on every request, so it is only as private as the connection —
+  fine over Render's HTTPS, not fine over plain HTTP. It is a lock on a page one person
+  uses, not an account system: there is no rate limiting, no lockout and no audit trail
+  of who added what.
+- **Restrict the Google Maps key** to your domain in the Google Cloud console before you
+  ship it. A browser key is public by definition — it is in the page source — and an
+  unrestricted one is somebody else's map quota, billed to you.

@@ -319,3 +319,318 @@ def test_the_detail_page_says_whose_photograph_it_is():
     assert "champagne-terroir.fr" in flat
     assert "belongs to the retailer or the producer, not to this site" in flat
     assert "permission is sought" in flat
+
+
+# --- the map -----------------------------------------------------------------------
+
+def test_the_houses_are_one_per_address_not_one_per_wine(catalogue):
+    """Three wines on this list are made at Olivier Rousseaux's cellar in Verzenay.
+    Mapped wine-by-wine that is three markers on one roof, two of them unreachable."""
+    from app.winehouses import winehouses
+
+    houses = winehouses(catalogue)
+    addresses = [h["address"] for h in houses]
+    assert len(addresses) == len(set(addresses))
+
+    verzenay = next(h for h in houses if "Verzenay" in h["address"])
+    assert len(verzenay["wines"]) == 3
+
+
+def test_a_house_with_no_coordinates_is_not_mapped():
+    """A marker at (0, 0) is in the Gulf of Guinea. Better no pin than a wrong one."""
+    from app.winehouses import winehouses
+
+    assert winehouses([
+        {"slug": "a", "producer": "A", "cuvee": "Brut", "price_eur": 1,
+         "headline_score": "", "score_tier": "none",
+         "visit": {"name": "A", "address": "somewhere", "lat": None, "lon": None}},
+        {"slug": "b", "producer": "B", "cuvee": "Brut", "price_eur": 1,
+         "headline_score": "", "score_tier": "none", "visit": None},
+    ]) == []
+
+
+def test_every_mapped_house_carries_its_wines(catalogue):
+    from app.winehouses import winehouses
+
+    houses = winehouses(catalogue)
+    assert houses, "the workbook's itinerary sheet should put nine houses on the map"
+    mapped = sum(len(h["wines"]) for h in houses)
+    assert mapped == sum(1 for w in catalogue if w["visit"] and w["visit"]["lat"] is not None)
+    for house in houses:
+        assert -90 <= house["lat"] <= 90 and -180 <= house["lon"] <= 180
+        assert house["wines"]
+
+
+def test_the_gallery_lists_the_houses_with_or_without_a_key():
+    """The addresses are rendered by the server, so they survive a missing API key, a
+    blocked script and scripting switched off entirely."""
+    body = client.get("/").text
+    assert "Where they are made" in body
+    for expected in ["Champagne Jacques Chaput & Fils".replace("&", "&amp;"),
+                     "1 Rue Blanche, 10200 Arrentières",
+                     "www.google.com/maps/search/"]:
+        assert expected in body, expected
+
+
+def test_without_a_key_the_map_says_so_rather_than_drawing_a_grey_box(monkeypatch):
+    from app import main
+
+    monkeypatch.setattr(main, "GOOGLE_MAPS_API_KEY", "")
+    body = client.get("/").text
+    assert "The map is switched off" in body
+    assert 'id="map-data"' not in body and "/static/map.js" not in body
+
+
+def test_with_a_key_the_map_and_its_pins_are_on_the_page(monkeypatch):
+    from app import main
+
+    monkeypatch.setattr(main, "GOOGLE_MAPS_API_KEY", "test-key")
+    body = client.get("/").text
+    assert 'data-maps-key="test-key"' in body
+    assert '<script src="/static/map.js"></script>' in body
+
+    pins = json.loads(re.search(r'id="map-data">(.*?)</script>', body, re.S).group(1))
+    assert len(pins) == 9
+    # An ampersand in "Chaput & Fils" must not be able to close the script element.
+    assert "</script>" not in body[body.index('id="map-data"'):body.index("</script>", body.index('id="map-data"'))]
+    assert any(p["name"] == "Champagne Jacques Chaput & Fils" for p in pins)
+
+
+def test_the_map_data_is_also_available_as_json():
+    body = client.get("/api/winehouses").json()
+    assert body["count"] == len(body["houses"]) == 9
+    assert {"name", "address", "lat", "lon", "wines"} <= set(body["houses"][0])
+
+
+# --- adding a wine -------------------------------------------------------------------
+#
+# Every test here writes, so every one of them writes to a copy. A test that appended to
+# data/champagnes.json would pass once and then change the answer to every test above it.
+
+from app import catalogue as store          # noqa: E402  - imported here, beside its tests
+
+GOOD = {"producer": "Test Grower", "cuvee": "Brut Nature", "price_eur": "24.90"}
+LOGIN = ("admin", "maorvelous")
+
+
+@pytest.fixture
+def scratch(tmp_path, monkeypatch):
+    """The catalogue, on a copy nobody else can see."""
+    copy = tmp_path / "champagnes.json"
+    copy.write_text(store.DATA.read_text(encoding="utf-8"), encoding="utf-8")
+    monkeypatch.setattr(store, "DATA", copy)
+    store.load_data.cache_clear()
+    yield copy
+    store.load_data.cache_clear()
+
+
+def stored(path) -> list[dict]:
+    return json.loads(path.read_text(encoding="utf-8"))["wines"]
+
+
+def test_the_admin_page_is_shut_without_a_login():
+    response = client.get("/admin")
+    assert response.status_code == 401
+    # Without this header the browser cannot offer a login box, and nobody gets in at all.
+    assert response.headers["www-authenticate"].startswith("Basic")
+
+
+def test_the_wrong_password_does_not_open_it():
+    assert client.get("/admin", auth=("admin", "not-the-password")).status_code == 401
+    assert client.get("/admin", auth=("someone", "maorvelous")).status_code == 401
+
+
+def test_the_right_login_opens_the_form():
+    response = client.get("/admin", auth=LOGIN)
+    assert response.status_code == 200
+    assert '<form class="adminform" method="post" action="/admin">' in response.text
+    assert 'name="producer"' in response.text and 'name="visit_lat"' in response.text
+
+
+def test_a_wine_cannot_be_added_without_the_login(scratch):
+    before = len(stored(scratch))
+    assert client.post("/admin", data=GOOD).status_code == 401
+    assert client.post("/admin", data=GOOD, auth=("admin", "wrong")).status_code == 401
+    assert len(stored(scratch)) == before
+
+
+def test_adding_a_wine_puts_it_on_the_site(scratch):
+    response = client.post("/admin", data={
+        **GOOD,
+        "professional_score": "2 stars, Guide Hachette 2026",
+        "visit_address": "1 Rue de la Vigne, 51200 Épernay",
+        "visit_lat": "49.05", "visit_lon": "3.95",
+    }, auth=LOGIN, follow_redirects=False)
+    # A redirect, not a rendered page: a refresh must not file the wine a second time.
+    assert response.status_code == 303
+    assert response.headers["location"] == "/admin?added=test-grower-brut-nature"
+
+    assert len(stored(scratch)) == 17
+    assert client.get("/champagne/test-grower-brut-nature").status_code == 200
+    body = client.get("/").text
+    assert "/champagne/test-grower-brut-nature" in body
+    assert "Seventeen Champagnes" in body        # the copy counts, it does not say sixteen
+    assert client.get("/api/winehouses").json()["count"] == 10
+
+
+def test_an_added_wine_is_tiered_by_its_evidence_not_by_assertion(scratch):
+    """The form has no "tier" control on purpose. A gold badge is supposed to mean
+    somebody verified a rating, so the credential text is the only thing that can earn
+    one - and a form that could assert it would be a way to fake it by hand."""
+    client.post("/admin", data={**GOOD, "professional_score": "Guide Hachette 2026 (listed)",
+                                "score_tier": "verified", "rating_rank": "99"},
+                auth=LOGIN)
+    wine = next(w for w in stored(scratch) if w["slug"] == "test-grower-brut-nature")
+    assert wine["score_tier"] == "listed"        # not what the request asked for
+    assert wine["rating_rank"] == 0.25
+    assert wine["headline_score"] == "Guide Hachette listed"
+
+
+def test_an_added_wine_with_no_credential_claims_nothing(scratch):
+    client.post("/admin", data=GOOD, auth=LOGIN)
+    wine = next(w for w in stored(scratch) if w["slug"] == "test-grower-brut-nature")
+    assert wine["score_tier"] == "none"
+    assert wine["headline_score"] == "" and wine["professional_score"] == ""
+    assert "No professional rating found" in client.get("/champagne/" + wine["slug"]).text
+
+
+def test_the_file_keeps_its_order_and_its_numbering(scratch):
+    """It is stored cheapest-first and numbered from one, and the pages say so out loud
+    ("No. 4 of 17"). An insert has to hold both, not append and hope."""
+    client.post("/admin", data={**GOOD, "price_eur": "23.50"}, auth=LOGIN)
+    wines_now = stored(scratch)
+    prices = [w["price_eur"] for w in wines_now]
+    assert prices == sorted(prices)
+    assert [w["id"] for w in wines_now] == list(range(1, len(wines_now) + 1))
+    assert len({w["slug"] for w in wines_now}) == len(wines_now)
+
+
+def test_wines_sharing_a_price_are_not_shuffled_to_insert_one(scratch):
+    """Three pairs on this list share a price. Re-sorting on anything but the price
+    would reorder six records - and renumber them - to file one."""
+    before = [w["slug"] for w in stored(scratch)]
+    client.post("/admin", data={**GOOD, "price_eur": "40"}, auth=LOGIN)
+    after = [w["slug"] for w in stored(scratch) if w["slug"] != "test-grower-brut-nature"]
+    assert after == before
+
+
+def test_a_repeated_name_gets_its_own_page_rather_than_overwriting_one(scratch):
+    for _ in range(2):
+        client.post("/admin", data=GOOD, auth=LOGIN)
+    slugs = [w["slug"] for w in stored(scratch) if w["producer"] == "Test Grower"]
+    assert slugs == ["test-grower-brut-nature", "test-grower-brut-nature-2"]
+    for slug in slugs:
+        assert client.get(f"/champagne/{slug}").status_code == 200
+
+
+def test_a_bad_form_saves_nothing_and_gives_the_typing_back(scratch):
+    before = len(stored(scratch))
+    response = client.post("/admin", data={
+        "producer": "Half Finished", "cuvee": "", "price_eur": "about twenty",
+    }, auth=LOGIN)
+    assert response.status_code == 400
+    assert len(stored(scratch)) == before
+    assert "Nothing was saved" in response.text
+    assert 'value="Half Finished"' in response.text      # the form comes back filled in
+
+
+def test_half_a_coordinate_is_refused(scratch):
+    """One half of a pair puts the pin in the sea rather than in Champagne."""
+    response = client.post("/admin", data={**GOOD, "visit_lat": "49.05"}, auth=LOGIN)
+    assert response.status_code == 400
+    assert "the map needs both" in response.text
+    assert len(stored(scratch)) == 16
+
+
+def test_an_impossible_coordinate_is_refused(scratch):
+    response = client.post("/admin", data={**GOOD, "visit_lat": "999", "visit_lon": "3.95"},
+                           auth=LOGIN)
+    assert response.status_code == 400
+    assert len(stored(scratch)) == 16
+
+
+@pytest.mark.parametrize("field", ["product_url", "image_url", "visit_website"])
+def test_a_script_url_never_reaches_an_href(scratch, field):
+    """Every URL on this form is rendered into a link or an <img src>. Escaping does not
+    make `javascript:` safe there - it is a perfectly valid attribute value."""
+    response = client.post("/admin", data={**GOOD, field: "javascript:alert(1)"}, auth=LOGIN)
+    assert response.status_code == 400
+    assert len(stored(scratch)) == 16
+
+
+def test_a_form_posted_from_another_site_is_refused(scratch):
+    """Browsers attach cached Basic credentials to cross-site requests too, so the login
+    alone does not stop another page from submitting this form on the operator's behalf."""
+    response = client.post("/admin", data=GOOD, auth=LOGIN,
+                           headers={"origin": "https://not-this-site.example"})
+    assert response.status_code == 403
+    assert len(stored(scratch)) == 16
+
+
+def test_the_catalogue_is_never_left_half_written(scratch, monkeypatch):
+    """The file is written beside itself and moved into place. A crash mid-write must
+    leave the old catalogue readable rather than a truncated one."""
+    def explode(*args, **kwargs):
+        raise OSError("disk full")
+
+    monkeypatch.setattr(store.os, "replace", explode)
+    with pytest.raises(OSError):
+        client.post("/admin", data=GOOD, auth=LOGIN)
+
+    store.load_data.cache_clear()
+    assert len(stored(scratch)) == 16
+    assert client.get("/health").json()["wines"] == 16
+    # And nothing was left lying about beside it.
+    assert not list(scratch.parent.glob(".champagnes-*.json"))
+
+
+def test_the_committed_catalogue_is_untouched_by_all_of_this():
+    """The fixtures write to copies. If one ever did not, this is what would say so."""
+    assert len(load_data()["wines"]) == 16
+
+
+@pytest.mark.parametrize("value", ["nan", "inf", "1e400"])
+def test_a_price_that_is_not_json_is_refused(scratch, value):
+    """float("nan") is a number to Python and is not JSON. Written out it becomes the
+    bare token NaN, and the catalogue stops being a file anyone else can read."""
+    response = client.post("/admin", data={**GOOD, "price_eur": value}, auth=LOGIN)
+    assert response.status_code == 400
+    assert json.loads(scratch.read_text(encoding="utf-8"))      # still parses, strictly
+    assert len(stored(scratch)) == 16
+
+
+def test_the_written_catalogue_is_strict_json(scratch):
+    """What is written has to survive a reader that is not Python's."""
+    client.post("/admin", data={**GOOD, "description": 'He said "château" — 100% pinot'},
+                auth=LOGIN)
+    json.loads(scratch.read_text(encoding="utf-8"), parse_constant=_no_constants)
+    wine = next(w for w in stored(scratch) if w["slug"] == "test-grower-brut-nature")
+    assert wine["description"] == 'He said "château" — 100% pinot'
+
+
+def _no_constants(name):
+    raise AssertionError(f"{name} is not JSON")
+
+
+def test_the_admin_page_is_behind_a_password_not_behind_the_age_gate():
+    """The gate never lifts without script, which is the right way to fail for a public
+    showcase and the wrong way to fail for the form it is edited with. A password says
+    more about who is asking than a checkbox does."""
+    body = client.get("/admin", auth=LOGIN).text
+    assert 'id="age-gate"' not in body
+    assert '<div id="site" class="site">' in body      # visible, not hidden
+    # And the public page is still gated exactly as it was.
+    assert '<div id="site" class="site" hidden>' in client.get("/").text
+
+
+def test_the_importers_ratings_and_the_forms_ratings_are_the_same_ratings(catalogue):
+    """app/ratings.py was lifted out of scripts/import_xlsx.py so that a wine typed into
+    /admin is tiered by the same rules as one read from the workbook. Re-deriving every
+    committed record from its credential string is what says the lift changed nothing."""
+    from app.ratings import derive
+
+    for wine in catalogue:
+        again = derive(wine["professional_score"])
+        for field in ("score_tier", "headline_score", "stars", "points",
+                      "coup_de_coeur", "rating_rank"):
+            assert again[field] == wine[field], f'{wine["producer"]}: {field}'
