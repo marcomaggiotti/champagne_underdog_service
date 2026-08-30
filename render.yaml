@@ -2,12 +2,27 @@
 #
 # One web service. From the Render dashboard: New -> Blueprint -> point at this repo.
 #
-# It needs nothing configured to run: the catalogue is committed as data/champagnes.json
-# and read at startup, so there is no database, no API key and no external call. If that
-# file is missing or empty the health check fails rather than the site quietly serving an
-# empty gallery.
+# The public site needs nothing configured to run: the catalogue is committed as
+# data/champagnes.json and read at startup, so there is no database and no external
+# call. If that file is missing or empty the health check fails rather than the site
+# quietly serving an empty gallery.
 #
-# The free plan sleeps after 15 minutes idle and takes ~50s to wake, which for a
+# Two features do want configuring, and both degrade honestly without it:
+#
+#   GOOGLE_MAPS_API_KEY  draws the map of the growers on the front page. Without it the
+#                        page says the map is switched off and lists the same addresses -
+#                        a keyless Google map is a grey box stamped "for development
+#                        purposes only", which is worse than no map.
+#   ADMIN_USER /         the login on /admin, where a wine is added. They default to
+#   ADMIN_PASSWORD       admin/maorvelous, which is written down in a public repository,
+#                        so set them here before this is reachable from the internet.
+#
+# A WARNING ABOUT /admin ON THE FREE PLAN: Render's disk is ephemeral. A wine added
+# through the form is written into the checkout and is gone at the next deploy or
+# restart. To keep it, either add a persistent disk and point CHAMPAGNE_DATA at a file
+# on it, or treat /admin as a way to draft a wine and commit the JSON it produces.
+#
+# The free plan also sleeps after 15 minutes idle and takes ~50s to wake, which for a
 # showcase is fine - but the first visitor after a quiet spell waits.
 services:
   - type: web
@@ -22,3 +37,10 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
+      # sync: false means "ask me in the dashboard" - none of these belong in the repo.
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: ADMIN_USER
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

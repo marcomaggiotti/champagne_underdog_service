@@ -1,0 +1,64 @@
+{# Where the growers are.
+
+   Two things are deliberate here. The list of houses underneath the map is not a
+   fallback bolted on afterwards - it is always rendered, because it is the only part
+   that works with scripting off, and because an address and a phone number are what
+   you actually need to visit somebody. The map is the picture; the list is the data.
+
+   And the map only appears when a Google Maps key is configured. A keyless map draws
+   a grey rectangle stamped "for development purposes only" across the growers' faces,
+   which is worse than the honest list on its own. #}
+<section class="mapblock" aria-labelledby="map-title">
+  <div class="sortbar">
+    <h2 id="map-title">Where they are made</h2>
+    <p class="thin">
+      {{ houses | length | words | capitalize }} houses, from the Montagne de Reims down to the Côte des Bar
+    </p>
+  </div>
+  <p class="thin sortnote">
+    Every grower on this list whose address could be confirmed. Call before you drive:
+    most are single families working their own vines, and several are closed at the
+    weekend. Opening hours are on each wine&rsquo;s page.
+  </p>
+
+  {% if houses %}
+    {% if maps_key %}
+      {# The pins, for the script. Rendered as JSON rather than written into the script
+         itself: an apostrophe in "Champagne Cyrill Banchet" should not be able to end a
+         string, and here it cannot. #}
+      <script type="application/json" id="map-data">{{ houses | tojson }}</script>
+      <div id="map" class="map" data-maps-key="{{ maps_key }}"
+           role="application" aria-label="Map of the growers in Champagne">
+        <p class="map-note">Loading the map&hellip;</p>
+      </div>
+    {% else %}
+      <p class="map-off">
+        <strong>The map is switched off.</strong> Google Maps needs an API key, and none
+        is configured — set <code>GOOGLE_MAPS_API_KEY</code> and it appears here. The
+        addresses below are the same ones it would pin.
+      </p>
+    {% endif %}
+
+    <ul class="houses">
+      {% for house in houses %}
+      <li class="house">
+        <h3>{{ house.name }}</h3>
+        {% if house.region %}<p class="house-region">{{ house.region }}</p>{% endif %}
+        {% if house.address %}<p class="house-address">{{ house.address }}</p>{% endif %}
+        <p class="house-wines">
+          {% for wine in house.wines %}
+            <a href="/champagne/{{ wine.slug }}">{{ wine.cuvee }}<em>{{ wine.price_eur | price }}</em></a>
+          {% endfor %}
+        </p>
+        <p class="links">
+          <a href="https://www.google.com/maps/search/?api=1&amp;query={{ house.lat }},{{ house.lon }}"
+             target="_blank" rel="noopener noreferrer">Open in Google Maps ↗</a>
+          {% if house.phone %}<a href="tel:{{ house.phone | replace(' ', '') }}">{{ house.phone }}</a>{% endif %}
+        </p>
+      </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="map-off">No address on this list could be confirmed, so there is nothing to map.</p>
+  {% endif %}
+</section>

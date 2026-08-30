@@ -35,9 +35,15 @@ except ImportError:  # pragma: no cover - the script's only dependency
 REPO = Path(__file__).resolve().parent.parent
 OUT = REPO / "data" / "champagnes.json"
 
-# A number attached to "stars", "pts" or "points" is a real rating. A bare year in
-# "Guide Hachette 2026 (listed)" is not, which is the whole distinction the legend draws.
-_VERIFIED = re.compile(r"\b\d+\s*(?:stars?|pts|points)\b|coup de c", re.IGNORECASE)
+# Run as `python scripts/import_xlsx.py`, it is scripts/ that lands on the path, not the
+# repo - so put the repo there before importing from app.
+sys.path.insert(0, str(REPO))
+
+# The rating rules are the site's, not this script's: a wine typed into /admin has to be
+# tiered and ranked identically to one imported here, or the gallery's order stops
+# meaning one thing. See app/ratings.py.
+from app.ratings import derive, slugify  # noqa: E402
+
 _EMPTY = {"", "—", "-", "not specified", "none", "n/a", "(not found)", "(no site listed)"}
 
 
@@ -53,11 +59,6 @@ def number(value) -> float | None:
         return None
 
 
-def slugify(text: str) -> str:
-    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
-    return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", text.lower())).strip("-")
-
-
 def key_words(name: str) -> set[str]:
     """Surnames, for matching a wine to its producer across sheets.
 
@@ -67,73 +68,6 @@ def key_words(name: str) -> set[str]:
     plain = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode().lower()
     stop = {"champagne", "and", "fils", "et", "de", "la", "le", "du", "des"}
     return {w for w in re.findall(r"[a-z]+", plain) if len(w) >= 4 and w not in stop}
-
-
-def rating_parts(professional: str) -> dict:
-    """The numbers behind a credential string, so the list can be ordered by it.
-
-    A rating string can name more than one body - Jacques Chaput carries two stars from
-    Guide Hachette and three from 1001 Dégustations - so every star count in the string
-    is collected and the best one is used.
-    """
-    stars = [int(n) for n in re.findall(r"(\d+)\s*stars?", professional, re.IGNORECASE)]
-    points = [int(n) for n in re.findall(r"(\d+)\s*(?:pts|points)", professional, re.IGNORECASE)]
-    return {
-        "stars": max(stars) if stars else None,
-        "points": max(points) if points else None,
-        "coup_de_coeur": "coup de c" in professional.lower(),
-    }
-
-
-def rating_rank(parts: dict) -> float:
-    """How strongly a wine is credentialled, for sorting. Higher is better.
-
-    Guide Hachette stars and a critic's point score are not the same scale and cannot be
-    made into one, so this is a judgement stated plainly rather than a calculation:
-
-      * the best star count any professional guide awarded, plus
-      * half a point for a Coup de Cœur - the guide's own top distinction, given to
-        roughly six wines nationally, so it outranks the stars beside it;
-      * where only a point score exists, it stands in for a star count: 96+ sits just
-        under three stars, 90-95 just over two.
-
-    A wine with no professional rating scores zero and sorts below every wine that has
-    one, which is the only part of this that is not a judgement.
-    """
-    if parts["stars"] is not None:
-        return parts["stars"] + (0.5 if parts["coup_de_coeur"] else 0.0)
-    if parts["points"] is not None:
-        return 2.8 if parts["points"] >= 96 else (2.3 if parts["points"] >= 90 else 1.5)
-    return 0.0
-
-
-def score_tier(professional: str) -> str:
-    if not professional:
-        return "none"
-    return "verified" if _VERIFIED.search(professional) else "listed"
-
-
-def headline_score(professional: str, tier: str, parts: dict | None = None) -> str:
-    """The one short string the gallery card shows.
-
-    Long enough to be honest, short enough to sit on a card - the full text is on the
-    detail page.
-    """
-    if tier == "none":
-        return ""
-    parts = parts or rating_parts(professional)
-    # Hachette's own star count, which is what the badge names - not the best count from
-    # any guide, which would attribute another body's rating to Hachette.
-    hachette = re.search(r"(\d+)\s*stars?[^;]*guide hachette", professional, re.IGNORECASE)
-    stars = hachette.group(1) if hachette else (parts["stars"] and str(parts["stars"]))
-    if stars and parts["coup_de_coeur"]:
-        return f"{stars}★ + Coup de Cœur"
-    if stars:
-        return f"{stars}★ Guide Hachette"
-    if parts["points"]:
-        source = "Decanter" if "decanter" in professional.lower() else "critic"
-        return f"{parts['points']} pts ({source})"
-    return "Guide Hachette listed"
 
 
 def rows_of(worksheet, header_row: int = 0, header_starts_with: str = "") -> list[dict]:
@@ -233,7 +167,6 @@ def load(path: Path) -> dict:
             continue
         words = key_words(producer)
         professional = clean(row.get("Professional Score / Rating"))
-        tier = score_tier(professional)
 
         # Match the photograph on producer *and* cuvée where a producer has two wines.
         candidates = [i for i in images if i["keys"] & words]
@@ -243,12 +176,6 @@ def load(path: Path) -> dict:
         image = candidates[0] if candidates else {}
         visit = matching(visits, words)
         prices = matching(comparisons, words, first_only=False)
-        parts = rating_parts(professional)
-        rank = rating_rank(parts)
-        if tier == "listed":
-            # Named by the guide but with the star count unconfirmed: ranked above the
-            # wines with nothing, below every wine whose rating was actually pinned down.
-            rank = 0.25
 
         wines.append({
             "id": int(float(row["#"])),
@@ -259,13 +186,9 @@ def load(path: Path) -> dict:
             "classification": clean(row.get("Classification")),
             "style": clean(row.get("Style / Grapes")),
             "price_eur": number(row.get("Price (EUR)")),
-            "professional_score": professional,
-            "score_tier": tier,
-            "headline_score": headline_score(professional, tier, parts),
-            "stars": parts["stars"],
-            "points": parts["points"],
-            "coup_de_coeur": parts["coup_de_coeur"],
-            "rating_rank": rank,
+            # professional_score, score_tier, headline_score, stars, points,
+            # coup_de_coeur and rating_rank, all from the one credential string.
+            **derive(professional),
             "medals": clean(row.get("Medals / Awards")),
             "retailer_rating": number(row.get("Retailer Rating (/5)")),
             "description": clean(row.get("Website Description (ready to publish)")),

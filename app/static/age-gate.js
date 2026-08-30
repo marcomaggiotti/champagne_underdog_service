@@ -20,6 +20,9 @@
     gate.remove();
     site.hidden = false;
     document.body.classList.remove('gated');
+    // The map cannot measure itself inside a hidden element, so it waits for this
+    // rather than for load. Anything else that needs a laid-out page can too.
+    document.dispatchEvent(new CustomEvent('site:revealed'));
   }
 
   function remember() {
